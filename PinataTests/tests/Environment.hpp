@@ -8,6 +8,8 @@
 class Environment : public ::testing::Environment {
   private:
     std::optional<PinataClient> mClient;
+    int mClientVersionMajor = 0;
+    int mClientVersionMinor = 0;
     static Environment *gInstance;
 
   public:
@@ -29,4 +31,10 @@ class Environment : public ::testing::Environment {
 
     /// Get a reference to the connection.
     PinataClient &getClient() noexcept;
+
+    /// Get the client's major version number.
+    int getClientVersionMajor() const noexcept { return mClientVersionMajor; }
+
+    /// Get the client's minor version number.
+    int getClientVersionMinor() const noexcept { return mClientVersionMinor; }
 };
