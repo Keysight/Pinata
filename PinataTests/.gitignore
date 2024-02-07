@@ -1,0 +1,9 @@
+dilithium3_round2/
+dilithium3_round3/
+kyber512_round3/
+fuzz-dilithium
+fuzz-kyber
+crash-*
+*.json
+.cache
+build/

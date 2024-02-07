@@ -1,0 +1,30 @@
+target_licensed_sources(
+  packing.c
+  polyvec.c
+  api.h
+  pointwise_mont.s
+  sign.h
+  smallpoly.h
+  vector.h
+  ntt.S
+  config.h
+  poly.c
+  symmetric.h
+  polyvec.h
+  poly.h
+  rounding.h
+  params.h
+  wrapper.h
+  ntt.h
+  pointwise_mont.h
+  rounding.c
+  vector.s
+  wrapper.c
+  packing.h
+  smallntt.S
+  reduce.h
+  smallntt.h
+  sign.c
+  symmetric-shake.c
+  smallpoly.c
+)

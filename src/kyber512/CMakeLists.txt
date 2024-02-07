@@ -1,0 +1,27 @@
+target_licensed_sources(
+  polyvec.c
+  api.h
+  verify.h
+  reduce.S
+  kem.c
+  indcpa.h
+  fastbasemul.S
+  cbd.h
+  randombytes.h
+  cbd.c
+  indcpa.c
+  poly.c
+  symmetric.h
+  polyvec.h
+  poly.h
+  params.h
+  ntt.c
+  wrapper.h
+  fastinvntt.S
+  ntt.h
+  fastntt.S
+  wrapper.c
+  symmetric-fips202.c
+  fastaddsub.S
+  verify.c
+)
