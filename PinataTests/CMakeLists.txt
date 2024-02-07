@@ -7,19 +7,18 @@ find_package(Boost REQUIRED)
 
 set(DILITHIUM PQClean/crypto_sign/dilithium3/clean)
 set(KYBER PQClean/crypto_kem/kyber512/clean)
+set(COMMON PQClean/common)
 
 add_executable(PinataTests
     main.cpp
-    dilithium/test-dilithium.cpp
-    kyber/test-kyber.cpp
-    tests/Environment.cpp
-    tests/PinataTests.cpp
-    utilities/common.cpp
-    #COMMON
-    PQClean/common/fips202.c
-    PQClean/common/randombytes.c
-    PQClean/common/aes.c
-    #DILITHIUM 
+    Environment.cpp
+    ClassicFirmware.cpp
+    HardwareFirmware.cpp
+    PqcFirmware.cpp
+    common.cpp
+    ${COMMON}/fips202.c
+    ${COMMON}/randombytes.c
+    ${COMMON}/aes.c
     ${DILITHIUM}/packing.c
     ${DILITHIUM}/ntt.c
     ${DILITHIUM}/poly.c
@@ -28,7 +27,6 @@ add_executable(PinataTests
     ${DILITHIUM}/rounding.c
     ${DILITHIUM}/sign.c
     ${DILITHIUM}/symmetric-shake.c
-    #KYBER
     ${KYBER}/indcpa.c
     ${KYBER}/polyvec.c
     ${KYBER}/reduce.c

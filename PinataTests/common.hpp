@@ -30,12 +30,16 @@ extern const uint8_t defaultKeySM4[16];
 extern const uint8_t defaultKeyPRESENT80[10];
 extern const uint8_t defaultKeyPRESENT128[16];
 
+/// The variant of the firmware we are dealing with.
+enum class FirmwareVariant { Classic, Hardware, PostQuantum };
+
 class PinataClient {
 public:
     PinataClient();
     PinataClient(const char* serialPortFile);
 
     std::pair<int, int> getVersion();
+    FirmwareVariant determineFirmwareVariant();
     std::pair<int, int> dilithiumGetKeySizes();
     uint8_t dilithiumGetSecurityLevel();
     void dilithiumSetPublicPrivateKeyPair(const uint8_t* publicKey, size_t publicKeySize, const uint8_t* privateKey, size_t privateKeySize);

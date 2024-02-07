@@ -1,3 +1,4 @@
+#include "TestBase.hpp"
 #include <array>
 #include <cstdint>
 #include <cstdlib>
@@ -7,30 +8,30 @@
 #include <openssl/rand.h>
 #include <stdexcept>
 
-#include "../kyber/test-kyber.hpp"
-#include "Environment.hpp"
-
 using EVP_CIPHER_CTX_ptr = std::unique_ptr<EVP_CIPHER_CTX, decltype(&::EVP_CIPHER_CTX_free)>;
 using AesBlock = std::array<uint8_t, 16>;
 using DesBlock = std::array<uint8_t, 8>;
 
-class ClassicFirmware : public ::testing::Test {
+class ClassicFirmware : public TestBase {
 
   protected:
-    PinataClient &mClient;
-
     uint8_t pt_16bytes[16];
     uint8_t pt_8bytes[8];
     uint8_t ct_16bytes[16];
     uint8_t ct_8bytes[8];
-    uint8_t kyber_data[KYBER512_SHARED_SECRET_SIZE];
 
-    ClassicFirmware() : mClient(Environment::getInstance().getClient()) {
+    ClassicFirmware() {
         RAND_bytes(pt_16bytes, 16);
         RAND_bytes(ct_16bytes, 16);
         RAND_bytes(pt_8bytes, 8);
         RAND_bytes(ct_8bytes, 8);
-        RAND_bytes(kyber_data, KYBER512_SHARED_SECRET_SIZE);
+    }
+
+    void SetUp() override {
+        const FirmwareVariant variant = Environment::getInstance().getFirmwareVariant();
+        if (variant != FirmwareVariant::Hardware && variant != FirmwareVariant::Classic) {
+            GTEST_SKIP();
+        }
     }
 
     AesBlock AES128_ecb_encrypt(uint8_t pt[16], const uint8_t key[16]) {

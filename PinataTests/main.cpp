@@ -1,4 +1,4 @@
-#include "tests/Environment.hpp"
+#include "Environment.hpp"
 #include <gtest/gtest.h>
 
 int main(int argc, char **argv) {

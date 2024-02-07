@@ -32,6 +32,7 @@ void Environment::SetUp() {
                "will start failing. So we stop here.\n";
         throw;
     }
+    mFirmwareVariant = mClient->determineFirmwareVariant();
 }
 
 void Environment::TearDown() {

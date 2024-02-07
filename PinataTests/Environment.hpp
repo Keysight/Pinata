@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../utilities/common.hpp"
+#include "common.hpp"
 #include <gtest/gtest.h>
 #include <optional>
 
@@ -10,6 +10,7 @@ class Environment : public ::testing::Environment {
     std::optional<PinataClient> mClient;
     int mClientVersionMajor = 0;
     int mClientVersionMinor = 0;
+    FirmwareVariant mFirmwareVariant = FirmwareVariant::Classic;
     static Environment *gInstance;
 
   public:
@@ -37,4 +38,6 @@ class Environment : public ::testing::Environment {
 
     /// Get the client's minor version number.
     int getClientVersionMinor() const noexcept { return mClientVersionMinor; }
+
+    FirmwareVariant getFirmwareVariant() const noexcept { return mFirmwareVariant; }
 };
