@@ -134,9 +134,9 @@ macro(add_licensed_subdir SUBDIR TARGETS SPDX_LICENSE_IDENTIFIER WEBSITE SOURCE_
 endmacro()
 
 #                   Subdirectory       Targets      SPDX License           Informational Website                                       Source Code Origin
-add_licensed_subdir(swDES              "classic;hw" NOTFOUND               NOTFOUND                                                    NOTFOUND)
-add_licensed_subdir(swAES              "classic;hw" NOTFOUND               NOTFOUND                                                    NOTFOUND)
-add_licensed_subdir(swmAES             "classic;hw" NOTFOUND               NOTFOUND                                                    NOTFOUND)
+add_licensed_subdir(swDES              "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                           https://github.com/Riscure/Pinata.git)
+add_licensed_subdir(swAES              "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                           https://github.com/Riscure/Pinata.git)
+add_licensed_subdir(swmAES             "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                           https://github.com/Riscure/Pinata.git)
 add_licensed_subdir(rsa                "classic;hw" NOTFOUND               NOTFOUND                                                    NOTFOUND)
 add_licensed_subdir(rsacrt             "classic;hw" NOTFOUND               NOTFOUND                                                    NOTFOUND)
 add_licensed_subdir(sm4                "classic;hw" "BSD-3-Clause;OpenSSL" https://en.wikipedia.org/wiki/SM4_\(cipher\)                https://raw.githubusercontent.com/openssl/openssl/704e8090b4a789f52af07de9a3ebbe11db8e19f8/crypto/sm4/sm4.c)
