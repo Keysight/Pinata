@@ -148,7 +148,7 @@ Example of compiling a particular firmware:
 Add a udev rule for the Pinata:
 
 ```sh
-echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", MODE="0666", GROUP="plugdev"' > /etc/udev/rules.d/69-pinata.rules
+sudo mkdir -p /etc/udev/rules.d && echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", MODE="0666", GROUP="plugdev"' | sudo tee /etc/udev/rules.d/69-pinata.rules
 ```
 
 Add user to the `plugdev` group:
