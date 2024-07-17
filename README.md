@@ -113,7 +113,9 @@ Hardware only
 
 ## Building Pinata Firmware
 
-You can build pinata firmware either using wsl or on a native linux machine. The description bellow is based on UBUNTU 22.04 machine
+You can build pinata firmware either using wsl or on a native linux machine. The description bellow is based on an
+UBUNTU 22.04 machine. These steps will also work for wsl, but to get access to the Pinata board in wsl, see the 
+troubleshooting steps about Windows and wsl.
 
 ### Requirements
 
@@ -228,3 +230,15 @@ You need to be part of the `dialout` group to be able to open serial ports. Run
 ```sh
 sudo usermod -a -G dialout $USER
 ```
+
+### Pinata board not recognized by Windows
+
+If you are planning to program the Pinata using wsl or from a virtual machine in Windows, the operating system must 
+first be able to recognize the Pinata hardware device. For that, you must install the USB driver for the device, which
+can be found here: https://www.st.com/en/development-tools/stsw-link009.html.
+
+
+### USB ports not present in wsl
+
+In order for wsl to have access to the pinata board, the USB port on which the board is connect needs to be connected 
+to wsl. This can be done by following the following guide: https://learn.microsoft.com/en-us/windows/wsl/connect-usb.
