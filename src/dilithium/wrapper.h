@@ -8,6 +8,7 @@
 #define DILITHIUM_PRIVATE_KEY_SIZE 4016
 #define DILITHIUM_SIGNATURE_SIZE 3293
 #define DILITHIUM_MESSAGE_SIZE 16
+#define DILITHIUM_N 256
 #define DILITHIUM_SIGNED_MESSAGE_SIZE (DILITHIUM_SIGNATURE_SIZE + DILITHIUM_MESSAGE_SIZE)
 
 /**
@@ -78,5 +79,15 @@ int DilithiumState_verify(const DilithiumState* self, uint8_t *signedMessage);
  * @return     0 when signing succeeds, non-zero otherwise.
  */
 int DilithiumState_sign(const DilithiumState* self, uint8_t* signature, const uint8_t* message);
+
+///
+/// @brief        Perform a forward NTT.
+///
+/// @param[inout] coefficients  Buffer of polynomial coefficients in integer
+///                             domain. The computation is done in-place, and
+///                             this array contains the coefficients in the
+///                             frequency domain after this function returns.
+///
+int Dilithium_ntt(uint32_t *coefficients);
 
 #endif // _DILITHIUM_WRAPPER_H_
