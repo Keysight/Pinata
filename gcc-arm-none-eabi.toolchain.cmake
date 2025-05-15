@@ -1,5 +1,8 @@
 # Toolchain for gcc-arm-none-eabi
-set(PREFIX /usr/bin/arm-none-eabi-)
+if(NOT DEFINED PREFIX)
+	message(STATUS "PREFIX variable is not defined. Assuming \"/usr/bin/arm-none-eabi-\"")
+	set(PREFIX /usr/bin/arm-none-eabi-)
+endif()
 set(CMAKE_C_COMPILER ${PREFIX}gcc)
 set(CMAKE_CXX_COMPILER ${PREFIX}g++)
 set(CMAKE_ASM_COMPILER ${PREFIX}gcc)
