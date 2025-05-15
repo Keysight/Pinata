@@ -1,6 +1,6 @@
-build/
-*.o
 *.bin
 *.dfu
 *.elf
-
+*.o
+.cache/
+build/
