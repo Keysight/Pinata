@@ -298,6 +298,17 @@ int main(void) {
 				break;
 			}
 
+			case CMD_SW_DILITHIUM_NTT: {
+				int32_t polynomialBuffer[DILITHIUM_N];
+				// Receive the polynomial coefficients.
+				get_bytes(sizeof(int32_t)*DILITHIUM_N, (uint8_t*)polynomialBuffer);
+				BEGIN_INTERESTING_STUFF;
+				Dilithium_ntt(polynomialBuffer);
+				END_INTERESTING_STUFF;
+				// No reply is sent.
+				break;
+			}
+
 			case CMD_SW_KYBER512_SET_PUBLIC_AND_PRIVATE_KEY: {
 				// Receive the input parameters and handle the request.
 				get_bytes(KYBER512_PUBLIC_KEY_SIZE, Kyber512State_getPublicKey(&kyber512));

@@ -216,6 +216,15 @@
 ///   16-bit unsigned integer in little endian order that contains the private key size
 #define CMD_SW_DILITHIUM_GET_KEY_SIZES 0x94
 
+/// Perform Dilithium NTT.
+///
+/// Expected Input:
+///   A total of DILITHIUM_N 32-bit integers in little endian order.
+///
+/// Output:
+///   No reply is sent back.
+#define CMD_SW_DILITHIUM_NTT 0x9A
+
 #define CMD_SWDES_ENC_MISALIGNED 0x14
 #define CMD_SWAES128_ENC_MISALIGNED 0x1E
 #define CMD_SWDES_ENC_DUMMYROUNDS 0x15
