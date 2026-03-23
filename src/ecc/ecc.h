@@ -16,7 +16,7 @@
 #define CURVE25519_POINT_COMPRESSED_BYTES 32
 #define PROJ_COORD_RE_RAND_TOTAL_RAND_BYTES (4 * 256)
 
-void ecsm();
+void ecsm(uint8_t *rxBuffer);
 
 
 #endif
