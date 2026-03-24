@@ -1,11 +1,20 @@
-//Main file for Riscure Pinata Board rev3.0
-//Riscure 2014, 2015, 2016, 2017, 2018, 2019
+//Main file for Riscure Pinata Board rev3.3
+//Riscure 2014, 2015, 2016, 2017, 2018, 2019, 2026
 //
-//Code revision: 	3.2 -- 20190808v1
+//Code revision: 	3.3 -- 2026/03/24
 //
 //IMPORTANT:
 //Presence of hardware crypto engine is defined via the Makefile
 //Whether to include PQC algorithms (and exclude classic ciphers) is also decided via the Makefile
+//
+//Changelog from code revision 3.3 from 3.2
+//
+// - BREAKING CHANGE: Update cipher: Kyber     NIST Round 3 -> ML-KEM FIPS-203
+// - BREAKING CHANGE: Update cipher: Dilithium NIST Round 3 -> ML-DSA FIPS-204
+// 
+// - Notes: ML-DSA private key size has CHANGED! From 4016 to 4032 bytes.
+//          ML-DSA signature size has CHANGED! From 3293 to 3309 bytes.
+//          Please update your acquisition scripts!
 //
 //Changelog from code revision 3.2 from 3.1
 //
@@ -60,8 +69,8 @@
 #include "io.h"
 
 #ifdef VARIANT_PQC
-#include "dilithium/wrapper.h"
-#include "kyber512/wrapper.h"
+#include "mldsa/wrapper.h"
+#include "mlkem/wrapper.h"
 #endif
 
 //Local functions
@@ -113,8 +122,8 @@ unsigned char etxBuf[256] ={};
 #define END_INTERESTING_STUFF GPIOC->BSRRH = GPIO_Pin_2
 
 #ifdef VARIANT_PQC
-DilithiumState dilithium;
-Kyber512State kyber512;
+MlDsaState mldsa;
+MlKemState mlkem;
 #endif
 
 ////////////////////////////////////////////////////
@@ -238,29 +247,29 @@ int main(void) {
 
 #ifdef VARIANT_PQC
 
-			case CMD_SW_DILITHIUM_GET_VARIANT:
+			case CMD_SW_MLDSA_GET_VARIANT:
 				// Return the response.
-				send_char(getDilithiumAlgorithmVariant());
+				send_char(getMlDsaAlgorithmVariant());
 				break;
 
-			case CMD_SW_DILITHIUM_SET_PUBLIC_AND_PRIVATE_KEY: {
+			case CMD_SW_MLDSA_SET_PUBLIC_AND_PRIVATE_KEY: {
 				// Receive the input parameters and handle the request.
-				get_bytes(DILITHIUM_PUBLIC_KEY_SIZE, DilithiumState_getPublicKey(&dilithium));
-				get_bytes(DILITHIUM_PRIVATE_KEY_SIZE, DilithiumState_getPrivateKey(&dilithium));
+				get_bytes(MLDSA_PUBLIC_KEY_SIZE, MlDsaState_getPublicKey(&mldsa));
+				get_bytes(MLDSA_PRIVATE_KEY_SIZE, MlDsaState_getPrivateKey(&mldsa));
 
 				// Return the response.
 				send_char(0);
 				break;
 			}
 
-			case CMD_SW_DILITHIUM_VERIFY: {
+			case CMD_SW_MLDSA_VERIFY: {
 				// Receive the input parameters.
-				uint8_t* signedMessageBuffer = DilithiumState_getScratchPad(&dilithium);
-				get_bytes(DILITHIUM_SIGNED_MESSAGE_SIZE, signedMessageBuffer);
+				uint8_t* signedMessageBuffer = MlDsaState_getScratchPad(&mldsa);
+				get_bytes(MLDSA_SIGNED_MESSAGE_SIZE, signedMessageBuffer);
 
 				// Handle the request.
 				BEGIN_INTERESTING_STUFF;
-				int result = DilithiumState_verify(&dilithium, signedMessageBuffer);
+				int result = MlDsaState_verify(&mldsa, signedMessageBuffer);
 				END_INTERESTING_STUFF;
 
 				// Return the response.
@@ -268,20 +277,20 @@ int main(void) {
 				break;	
 			}
 
-			case CMD_SW_DILITHIUM_SIGN: {
+			case CMD_SW_MLDSA_SIGN: {
 				// Receive the input parameters.
-				uint8_t* signedMessageBuffer = DilithiumState_getScratchPad(&dilithium);
-				get_bytes(DILITHIUM_MESSAGE_SIZE, signedMessageBuffer + DILITHIUM_SIGNATURE_SIZE);
+				uint8_t* signedMessageBuffer = MlDsaState_getScratchPad(&mldsa);
+				get_bytes(MLDSA_MESSAGE_SIZE, signedMessageBuffer + MLDSA_SIGNATURE_SIZE);
 
 				// Handle the request.
 				BEGIN_INTERESTING_STUFF;
-				int result = DilithiumState_sign(&dilithium, signedMessageBuffer, signedMessageBuffer + DILITHIUM_SIGNATURE_SIZE);
+				int result = MlDsaState_sign(&mldsa, signedMessageBuffer, signedMessageBuffer + MLDSA_SIGNATURE_SIZE);
 				END_INTERESTING_STUFF;
 
 				if (result == 0) {
 					// OK: The message is now signed, let's send the signature of the message back.
 					send_char(0);
-					send_bytes(DILITHIUM_SIGNATURE_SIZE, signedMessageBuffer);
+					send_bytes(MLDSA_SIGNATURE_SIZE, signedMessageBuffer);
 				} else {
 					// ERROR: Signing the message failed.
 					send_char(1);
@@ -289,45 +298,45 @@ int main(void) {
 				break;
 			}
 
-			case CMD_SW_DILITHIUM_GET_KEY_SIZES: {
-				const uint16_t publicKeySize = DILITHIUM_PUBLIC_KEY_SIZE;
-				const uint16_t privateKeySize = DILITHIUM_PRIVATE_KEY_SIZE;
+			case CMD_SW_MLDSA_GET_KEY_SIZES: {
+				const uint16_t publicKeySize = MLDSA_PUBLIC_KEY_SIZE;
+				const uint16_t privateKeySize = MLDSA_PRIVATE_KEY_SIZE;
 				// Send the response; MUST be in little-endian order!
 				send_bytes(sizeof(publicKeySize), (const uint8_t*)&publicKeySize);
 				send_bytes(sizeof(privateKeySize), (const uint8_t*)&privateKeySize);
 				break;
 			}
 
-			case CMD_SW_DILITHIUM_NTT: {
-				int32_t polynomialBuffer[DILITHIUM_N];
+			case CMD_SW_MLDSA_NTT: {
+				int32_t polynomialBuffer[MLDSA_N];
 				// Receive the polynomial coefficients.
-				get_bytes(sizeof(int32_t)*DILITHIUM_N, (uint8_t*)polynomialBuffer);
+				get_bytes(sizeof(int32_t)*MLDSA_N, (uint8_t*)polynomialBuffer);
 				BEGIN_INTERESTING_STUFF;
-				Dilithium_ntt(polynomialBuffer);
+				MlDsa_ntt(polynomialBuffer);
 				END_INTERESTING_STUFF;
 				// No reply is sent.
 				break;
 			}
 
-			case CMD_SW_KYBER512_SET_PUBLIC_AND_PRIVATE_KEY: {
+			case CMD_SW_MLKEM_SET_PUBLIC_AND_PRIVATE_KEY: {
 				// Receive the input parameters and handle the request.
-				get_bytes(KYBER512_PUBLIC_KEY_SIZE, Kyber512State_getPublicKey(&kyber512));
-				get_bytes(KYBER512_PRIVATE_KEY_SIZE, Kyber512State_getPrivateKey(&kyber512));
+				get_bytes(MLKEM_PUBLIC_KEY_SIZE, MlKemState_getPublicKey(&mlkem));
+				get_bytes(MLKEM_PRIVATE_KEY_SIZE, MlKemState_getPrivateKey(&mlkem));
 				// Return the response.
 				send_char(0);
 				break;
 			}
 
-			case CMD_SW_KYBER512_GENERATE: {
+			case CMD_SW_MLKEM_GENERATE: {
 				// Generate a shared secret and an accompanying key encapsulation message.
 				BEGIN_INTERESTING_STUFF;
-				int result = Kyber512State_generate(&kyber512);
+				int result = MlKemState_generate(&mlkem);
 				END_INTERESTING_STUFF;
 				if (result == 0) {
 					// OK: The shared secret is now generated and encapsulated, let's send that back.
 					send_char(0);
-					send_bytes(KYBER512_SHARED_SECRET_SIZE, Kyber512State_getSharedSecretBuffer(&kyber512));
-					send_bytes(KYBER512_CIPHERTEXT_SIZE, Kyber512State_getKeyEncapsulationMessageBuffer(&kyber512));
+					send_bytes(MLKEM_SHARED_SECRET_SIZE, MlKemState_getSharedSecretBuffer(&mlkem));
+					send_bytes(MLKEM_CIPHERTEXT_SIZE, MlKemState_getKeyEncapsulationMessageBuffer(&mlkem));
 				} else {
 					// ERROR: Generation failed.
 					send_char(1);
@@ -335,18 +344,18 @@ int main(void) {
 				break;
 			}
 
-			case CMD_SW_KYBER512_DEC: {
+			case CMD_SW_MLKEM_DEC: {
 				// Receive the key encapsulation message that we are supposed to decode.
-				get_bytes(KYBER512_CIPHERTEXT_SIZE, Kyber512State_getKeyEncapsulationMessageBuffer(&kyber512));
-				memset(Kyber512State_getSharedSecretBuffer(&kyber512), 0, KYBER512_SHARED_SECRET_SIZE);
+				get_bytes(MLKEM_CIPHERTEXT_SIZE, MlKemState_getKeyEncapsulationMessageBuffer(&mlkem));
+				memset(MlKemState_getSharedSecretBuffer(&mlkem), 0, MLKEM_SHARED_SECRET_SIZE);
 				// Decode the key encapsulation message into a shared secret.
 				BEGIN_INTERESTING_STUFF;
-				int result = Kyber512State_decode(&kyber512);
+				int result = MlKemState_decode(&mlkem);
 				END_INTERESTING_STUFF;
 				if (result == 0) {
 					// OK: The shared secret is decoded, let's send that back.
 					send_char(0);
-					send_bytes(KYBER512_SHARED_SECRET_SIZE, Kyber512State_getSharedSecretBuffer(&kyber512));
+					send_bytes(MLKEM_SHARED_SECRET_SIZE, MlKemState_getSharedSecretBuffer(&mlkem));
 				} else {
 					// ERROR: Decoding the shared secret failed.
 					send_char(1);
@@ -354,9 +363,9 @@ int main(void) {
 				break;
 			}
 
-			case CMD_SW_KYBER512_GET_KEY_SIZES: {
-				const uint16_t publicKeySize = KYBER512_PUBLIC_KEY_SIZE;
-				const uint16_t privateKeySize = KYBER512_PRIVATE_KEY_SIZE;
+			case CMD_SW_MLKEM_GET_KEY_SIZES: {
+				const uint16_t publicKeySize = MLKEM_PUBLIC_KEY_SIZE;
+				const uint16_t privateKeySize = MLKEM_PRIVATE_KEY_SIZE;
 				// Send the response; MUST be in little-endian order!
 				send_bytes(sizeof(publicKeySize), (const uint8_t*)&publicKeySize);
 				send_bytes(sizeof(privateKeySize), (const uint8_t*)&privateKeySize);

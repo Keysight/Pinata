@@ -77,18 +77,16 @@ in the manual).
 #### Lattice-based
 |                    |        | SW       | HW |
 |--------------------|--------|----------|----|
-| CRYSTALS-Dilithium |        |          | -  |
-|                    | LEVEL2 | -        | -  |
-|                    | LEVEL3 | SIG, VER | -  |
-|                    | LEVEL5 | -        | -  |
-| CRYSTALS-Kyber     |        |          |    |
+| ML-DSA FIPS 204    |        |          | -  |
+|                    |     44 | -        | -  |
+|                    |     65 | SIG, VER | -  |
+|                    |     87 | -        | -  |
+| MKL-KEM FIPS 203   |        |          |    |
 |                    |    512 | ENC, DEC | -  |
 |                    |    768 | -        | -  |
 |                    |   1024 | -        | -  |
-|                    | 512-90s| -        | -  |
-|                    | 768-90s| -        | -  |
-|                    |1024-90s| -        | -  |
 
+Note: ML-DSA and ML-KEM are implemented in terms of the [PQM4 library for Cortex-M4 processors](https://github.com/mupq/pqm4.git). The exact git commit hash that is used can be found in the src/CMakeLists.txt file. The library is downloaded into the $BUILD/\_deps/pqm4-src folder.
 
 ### Hash functions
 
