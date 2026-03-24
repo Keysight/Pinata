@@ -5,9 +5,18 @@ find_package(OpenSSL REQUIRED)
 find_package(GTest REQUIRED)
 find_package(Boost REQUIRED)
 
-set(DILITHIUM PQClean/crypto_sign/dilithium3/clean)
-set(KYBER PQClean/crypto_kem/kyber512/clean)
-set(COMMON PQClean/common)
+include(FetchContent)
+FetchContent_Declare(
+    pqm4
+    GIT_REPOSITORY https://github.com/mupq/pqm4.git
+    # Keep this git hash the same as the one in src/CMakeLists.txt !
+    GIT_TAG a24bb4b662016968c19f5e6a0719c9ad530f0286
+)
+FetchContent_MakeAvailable(pqm4)
+
+set(DILITHIUM "${pqm4_SOURCE_DIR}/mupq/pqclean/crypto_sign/ml-dsa-65/clean")
+set(KYBER "${pqm4_SOURCE_DIR}/mupq/pqclean/crypto_kem/ml-kem-512/clean")
+set(COMMON "${pqm4_SOURCE_DIR}/mupq/pqclean/common")
 
 add_executable(PinataTests
     main.cpp
@@ -39,5 +48,7 @@ add_executable(PinataTests
 )
 
 target_compile_features(PinataTests PRIVATE cxx_std_20)
-target_include_directories(PinataTests PRIVATE PQClean/common)
+target_include_directories(PinataTests PRIVATE "${pqm4_SOURCE_DIR}/mupq/pqclean/common")
+set_source_files_properties(PqcFirmware.cpp PROPERTIES INCLUDE_DIRECTORIES "${pqm4_SOURCE_DIR}/mupq/pqclean")
 target_link_libraries(PinataTests PRIVATE Boost::boost OpenSSL::Crypto GTest::GTest)
+

@@ -4,8 +4,8 @@
 #include <openssl/rand.h>
 
 extern "C" {
-#include "PQClean/crypto_kem/kyber512/clean/api.h"
-#include "PQClean/crypto_sign/dilithium3/clean/api.h"
+#include "crypto_kem/ml-kem-512/clean/api.h"
+#include "crypto_sign/ml-dsa-65/clean/api.h"
 }
 
 #define DILITHIUM_PUBLIC_KEY_SIZE 1952
