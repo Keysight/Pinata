@@ -1,13 +1,13 @@
-//Main file for Riscure Pinata Board rev3.3
+//Main file for Riscure Pinata Board rev4.0
 //Riscure 2014, 2015, 2016, 2017, 2018, 2019, 2026
 //
-//Code revision: 	3.3 -- 2026/03/24
+//Code revision: 	4.0 -- 2026/03/24
 //
 //IMPORTANT:
 //Presence of hardware crypto engine is defined via the Makefile
 //Whether to include PQC algorithms (and exclude classic ciphers) is also decided via the Makefile
 //
-//Changelog from code revision 3.3 from 3.2
+//Changelog from code revision 4.0 from 3.2
 //
 // - BREAKING CHANGE: Update cipher: Kyber     NIST Round 3 -> ML-KEM FIPS-203
 // - BREAKING CHANGE: Update cipher: Dilithium NIST Round 3 -> ML-DSA FIPS-204
@@ -106,7 +106,7 @@ uint8_t rxBuffer[RXBUFFERLENGTH] = {};
 const uint8_t zeros[20]={'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'};
 const uint8_t glitched[] = { 0xFA, 0xCC };
 const uint8_t cmdByteIsWrong[] = { 'B','a','d','C','m','d','\n',0x00};
-const uint8_t codeVersion[] = { 'V','e','r',' ','3','.','2',0x00};
+const uint8_t codeVersion[] = { 'V','e','r',' ','4','.','0',0x00};
 
 volatile uint8_t usbSerialEnabled=0;
 volatile int busyWait1;

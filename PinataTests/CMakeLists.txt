@@ -7,7 +7,7 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.27)
     endif()
 endif()
 
-project(PinataTests VERSION 3.3 LANGUAGES C CXX)
+project(PinataTests VERSION 4.0 LANGUAGES C CXX)
 
 find_package(OpenSSL REQUIRED)
 find_package(GTest REQUIRED)

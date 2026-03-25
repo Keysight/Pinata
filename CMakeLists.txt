@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(Pinata VERSION 3.3 LANGUAGES C ASM)
+project(Pinata VERSION 4.0 LANGUAGES C ASM)
 
 if(NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
     message(STATUS "Setting CMAKE_BUILD_TYPE to MinSizeRel")
