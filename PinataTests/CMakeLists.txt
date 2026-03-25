@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.16)
-project(PinataTests C CXX)
+
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.27)
+    cmake_policy(SET CMP0144 NEW)
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.30)
+        cmake_policy(SET CMP0167 NEW)
+    endif()
+endif()
+
+project(PinataTests VERSION 3.3 LANGUAGES C CXX)
 
 find_package(OpenSSL REQUIRED)
 find_package(GTest REQUIRED)
@@ -14,6 +22,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(pqm4)
 
+# We can reuse the PQClean sources checked out by PQM4.
 set(DILITHIUM "${pqm4_SOURCE_DIR}/mupq/pqclean/crypto_sign/ml-dsa-65/clean")
 set(KYBER "${pqm4_SOURCE_DIR}/mupq/pqclean/crypto_kem/ml-kem-512/clean")
 set(COMMON "${pqm4_SOURCE_DIR}/mupq/pqclean/common")
