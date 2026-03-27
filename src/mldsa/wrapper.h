@@ -12,10 +12,10 @@
 #define MLDSA_SIGNED_MESSAGE_SIZE (MLDSA_SIGNATURE_SIZE + MLDSA_MESSAGE_SIZE)
 
 /**
- * @brief      Get the dilithium algorithm variant. There are a few variants and
+ * @brief      Get the ML-DSA algorithm variant. There are a few variants and
  *             only one of them is implemented.
  *
- * @return     The dilithium algorithm variant.
+ * @return     The ML-DSA algorithm variant.
  */
 int getMlDsaAlgorithmVariant();
 
