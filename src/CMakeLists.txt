@@ -1,6 +1,8 @@
 # Find programs that are used in flashing the firmware to the device.
 find_program(DFU_SUFFIX dfu-suffix)
 find_program(FLASHTOOL dfu-util)
+# Git is required for applying patches
+find_package(Git REQUIRED)
 
 if(NOT DFU_SUFFIX)
     message(STATUS "dfu-suffix was not found in $PATH, cannot create .dfu files")
@@ -210,12 +212,36 @@ set(mlkem_source_files
     "${mlkem_base_dir}/symmetric-fips202.c"
     "${mlkem_base_dir}/verify.c"
 )
-target_sources(pqc PRIVATE pqm4_hal/randombytes.c ${mupq_common_source_files} ${mldsa_source_files} ${mlkem_source_files})
+target_sources(pqc PRIVATE pqm4_hal/randombytes.c pqm4_hal/pinata_callbacks.c ${mupq_common_source_files} ${mldsa_source_files} ${mlkem_source_files})
 set_source_files_properties(mldsa/wrapper.c PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/pqm4_hal;${mldsa_base_dir}")
 set_source_files_properties(mlkem/wrapper.c PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/pqm4_hal;${mlkem_base_dir}")
 set_source_files_properties(${mldsa_source_files} PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/pqm4_hal;${mupq_common_dir}")
 set_source_files_properties(${mlkem_source_files} PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/pqm4_hal;${mupq_common_dir}")
 target_compile_definitions(pqc PRIVATE VARIANT_PQC $<$<BOOL:${RANDOM_SIGNING}>:DILITHIUM_RANDOMIZED_SIGNING>)
+
+# For the short triggering in ML-DSA sign, we need to modify the sign.c source a bit.
+# We use a patch file for that. Apply that patch file as part of the build.
+add_custom_command(
+    OUTPUT
+        "${CMAKE_CURRENT_BINARY_DIR}/mldsa-sign.patch.applied"
+    COMMAND
+        "${GIT_EXECUTABLE}" checkout .
+    COMMAND
+        "${GIT_EXECUTABLE}" apply "${CMAKE_CURRENT_SOURCE_DIR}/../patches/mldsa-sign.patch"
+    COMMAND
+        "${CMAKE_COMMAND}" -E touch "${CMAKE_CURRENT_BINARY_DIR}/mldsa-sign.patch.applied"
+    WORKING_DIRECTORY
+        "${pqm4_SOURCE_DIR}"
+    COMMENT
+        "Applying patch ${CMAKE_CURRENT_SOURCE_DIR}/../patches/mldsa-sign.patch"
+)
+
+add_custom_target(apply-mldsa-sign-patch
+    DEPENDS
+        "${CMAKE_CURRENT_BINARY_DIR}/mldsa-sign.patch.applied"
+)
+
+add_dependencies(pqc apply-mldsa-sign-patch)
 
 # After having collected all license information into lists, we now generate
 # the notice file.
