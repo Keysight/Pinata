@@ -40,15 +40,15 @@ public:
 
     std::pair<int, int> getVersion();
     FirmwareVariant determineFirmwareVariant();
-    std::pair<int, int> dilithiumGetKeySizes();
-    uint8_t dilithiumGetSecurityLevel();
-    void dilithiumSetPublicPrivateKeyPair(const uint8_t* publicKey, size_t publicKeySize, const uint8_t* privateKey, size_t privateKeySize);
-    void dilithiumSign(const uint8_t* messageBuffer, size_t messageBufferSize, uint8_t* signedMessageBuffer, size_t signedMessageBufferSize);
-    bool dilithiumVerify(const uint8_t* signatureBuffer, size_t signatureBufferSize);
-    std::pair<int, int> kyber512GetKeySizes();
-    void kyber512SetPublicPrivateKeyPair(const uint8_t* publicKey, size_t publicKeySize, const uint8_t* privateKey, size_t privateKeySize);
-    void kyber512Generate(uint8_t* sharedSecretBuffer, size_t sharedSecretBufferSize, uint8_t* keyEncapsulationMessageBuffer, size_t keyEncapsulationMessageBufferSize);
-    void kyber512Decode(const uint8_t* keyEncapsulationMessageBuffer, size_t keyEncapsulationMessageBufferSize, uint8_t* sharedSecretBuffer, size_t sharedSecretBufferSize);
+    std::pair<int, int> mldsaGetKeySizes();
+    uint8_t mldsaGetSecurityLevel();
+    void mldsaSetPublicPrivateKeyPair(const uint8_t* publicKey, size_t publicKeySize, const uint8_t* privateKey, size_t privateKeySize);
+    void mldsaSign(const uint8_t* messageBuffer, size_t messageBufferSize, uint8_t* signedMessageBuffer, size_t signedMessageBufferSize);
+    bool mldsaVerify(const uint8_t* signatureBuffer, size_t signatureBufferSize);
+    std::pair<int, int> mlkemGetKeySizes();
+    void mlkemSetPublicPrivateKeyPair(const uint8_t* publicKey, size_t publicKeySize, const uint8_t* privateKey, size_t privateKeySize);
+    void mlkemGenerate(uint8_t* sharedSecretBuffer, size_t sharedSecretBufferSize, uint8_t* keyEncapsulationMessageBuffer, size_t keyEncapsulationMessageBufferSize);
+    void mlkemDecode(const uint8_t* keyEncapsulationMessageBuffer, size_t keyEncapsulationMessageBufferSize, uint8_t* sharedSecretBuffer, size_t sharedSecretBufferSize);
     
     void doSymmetricCipherRequest(const uint8_t cmd, const uint8_t* input, const size_t inputSize, uint8_t* output,const size_t outputSize);
     void SWDESEncrypt(const uint8_t* plaintext, uint8_t* ciphertext);

@@ -20,18 +20,14 @@ extern "C" {
 #define MLKEM_SHARED_SECRET_SIZE 32
 #define MLKEM_CIPHERTEXT_SIZE 768
 
-#if DILITHIUM_PUBLIC_KEY_SIZE != PQCLEAN_DILITHIUM3_CLEAN_CRYPTO_PUBLICKEYBYTES
+#if MLDSA_PUBLIC_KEY_SIZE != PQCLEAN_MLDSA65_CLEAN_CRYPTO_PUBLICKEYBYTES
 #error invalid public key size, update me!
 #endif
-#if DILITHIUM_PRIVATE_KEY_SIZE != PQCLEAN_DILITHIUM3_CLEAN_CRYPTO_SECRETKEYBYTES
+#if MLDSA_PRIVATE_KEY_SIZE != PQCLEAN_MLDSA65_CLEAN_CRYPTO_SECRETKEYBYTES
 #error invalid private key size, update me!
 #endif
-#if DILITHIUM_SIGNATURE_SIZE != PQCLEAN_DILITHIUM3_CLEAN_CRYPTO_BYTES
+#if MLDSA_SIGNATURE_SIZE != PQCLEAN_MLDSA65_CLEAN_CRYPTO_BYTES
 #error invalid signature size, update me!
-#endif
-
-#if defined(MODE) && !defined(DILITHIUM_MODE)
-#define DILITHIUM_MODE MODE
 #endif
 
 #if MLKEM_PUBLIC_KEY_SIZE != PQCLEAN_MLKEM512_CLEAN_CRYPTO_PUBLICKEYBYTES
@@ -61,11 +57,11 @@ TEST_F(PqcFirmware, DilithiumLevel3) {
 
     // Ensure the mode is the same
     std::cerr << "asserting security level\n";
-    ASSERT_EQ(mClient.dilithiumGetSecurityLevel(), 3);
+    ASSERT_EQ(mClient.mldsaGetSecurityLevel(), 3);
 
     // Ensure public and private key sizes match
     std::cerr << "checking key sizes\n";
-    const auto [pinataPublicKeySize, pinataPrivateKeySize] = mClient.dilithiumGetKeySizes();
+    const auto [pinataPublicKeySize, pinataPrivateKeySize] = mClient.mldsaGetKeySizes();
     ASSERT_EQ(pinataPublicKeySize, PQCLEAN_MLDSA65_CLEAN_CRYPTO_PUBLICKEYBYTES);
     ASSERT_EQ(pinataPrivateKeySize, PQCLEAN_MLDSA65_CLEAN_CRYPTO_SECRETKEYBYTES);
 
@@ -74,7 +70,7 @@ TEST_F(PqcFirmware, DilithiumLevel3) {
 
     // Tell the pinata to use this public/private key pair for signing with Dilithium3
     std::cerr << "setup public/private key pair\n";
-    mClient.dilithiumSetPublicPrivateKeyPair(publicKey.data(), publicKey.size(), privateKey.data(), privateKey.size());
+    mClient.mldsaSetPublicPrivateKeyPair(publicKey.data(), publicKey.size(), privateKey.data(), privateKey.size());
 
     // Prepare the random message
     std::fill(pinataSignedMessage.begin(), pinataSignedMessage.end(), (unsigned char)0);
@@ -82,7 +78,7 @@ TEST_F(PqcFirmware, DilithiumLevel3) {
 
     // Sign the fuzzed message on pinata
     std::cerr << "sign message\n";
-    mClient.dilithiumSign(message.data(), message.size(), pinataSignedMessage.data(),
+    mClient.mldsaSign(message.data(), message.size(), pinataSignedMessage.data(),
                           PQCLEAN_MLDSA65_CLEAN_CRYPTO_BYTES);
 
     // Concatenate the signature and the fuzzed message together to obtain a "signed message"
@@ -107,7 +103,7 @@ TEST_F(PqcFirmware, DilithiumLevel3) {
 
     // Reference sign --> Pinata verify
     std::cerr << "verify message\n";
-    ASSERT_TRUE(mClient.dilithiumVerify(referenceSignedMessage.data(), referenceSignedMessage.size()));
+    ASSERT_TRUE(mClient.mldsaVerify(referenceSignedMessage.data(), referenceSignedMessage.size()));
 }
 
 TEST_F(PqcFirmware, Kyber512) {
@@ -124,16 +120,16 @@ TEST_F(PqcFirmware, Kyber512) {
 
     // Ensure public and private key sizes match
     std::cerr << "checking wether key sizes agree\n";
-    const auto [pinataPublicKeySize, pinataPrivateKeySize] = mClient.kyber512GetKeySizes();
+    const auto [pinataPublicKeySize, pinataPrivateKeySize] = mClient.mlkemGetKeySizes();
     ASSERT_EQ(pinataPublicKeySize, PQCLEAN_MLKEM512_CLEAN_CRYPTO_PUBLICKEYBYTES);
     ASSERT_EQ(pinataPrivateKeySize, PQCLEAN_MLKEM512_CLEAN_CRYPTO_SECRETKEYBYTES);
 
     // Generate a public/private key pair with the reference X86 implementation
     PQCLEAN_MLKEM512_CLEAN_crypto_kem_keypair(publicKey.data(), privateKey.data());
 
-    // Tell the pinata to use this public/private key pair for encrypting shared secrets with kyber512.
+    // Tell the pinata to use this public/private key pair for encrypting shared secrets with mlkem.
     std::cerr << "setting public private key pair\n";
-    mClient.kyber512SetPublicPrivateKeyPair(publicKey.data(), publicKey.size(), privateKey.data(), privateKey.size());
+    mClient.mlkemSetPublicPrivateKeyPair(publicKey.data(), publicKey.size(), privateKey.data(), privateKey.size());
 
     // Zero out arrays
     std::fill(ssPinataGenerateRefDecode.begin(), ssPinataGenerateRefDecode.end(), (unsigned char)0);
@@ -143,7 +139,7 @@ TEST_F(PqcFirmware, Kyber512) {
 
     // Generate a shared secret on Pinata
     std::cerr << "generating shared secret\n";
-    mClient.kyber512Generate(ssPinata.data(), ssPinata.size(), ctPinata.data(), ctPinata.size());
+    mClient.mlkemGenerate(ssPinata.data(), ssPinata.size(), ctPinata.data(), ctPinata.size());
 
     // Generate a shared secret with the reference implementation.
     PQCLEAN_MLKEM512_CLEAN_crypto_kem_enc(ctRef.data(), ssRef.data(), publicKey.data());
@@ -156,12 +152,12 @@ TEST_F(PqcFirmware, Kyber512) {
 
     // Decode the Pinata ciphertext with Pinata impl
     std::cerr << "decoding shared secret\n";
-    mClient.kyber512Decode(ctPinata.data(), ctPinata.size(), ssPinataGeneratePinataDecode.data(),
+    mClient.mlkemDecode(ctPinata.data(), ctPinata.size(), ssPinataGeneratePinataDecode.data(),
                            ssPinataGeneratePinataDecode.size());
 
     // Decode the ref ciphertext with Pinata impl
     std::cerr << "decoding shared secret (ref)\n";
-    mClient.kyber512Decode(ctRef.data(), ctRef.size(), ssRefGeneratePinataDecode.data(),
+    mClient.mlkemDecode(ctRef.data(), ctRef.size(), ssRefGeneratePinataDecode.data(),
                            ssRefGeneratePinataDecode.size());
 
     ASSERT_EQ(ssPinata, ssPinataGeneratePinataDecode);
