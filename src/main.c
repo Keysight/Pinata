@@ -126,10 +126,10 @@ unsigned char etxBuf[256] ={};
 MlDsaState g_mldsa;
 MlKemState g_mlkem;
 void handle_mldsa_sign_start() {
-	GPIOC->BSRRL = GPIO_Pin_1;
+	BEGIN_INTERESTING_STUFF;
 }
 void handle_mldsa_sign_finish() {
-	GPIOC->BSRRH = GPIO_Pin_1;
+	END_INTERESTING_STUFF;
 }
 #endif
 
@@ -292,15 +292,8 @@ int main(void) {
 				get_bytes(MLDSA_MESSAGE_SIZE, signedMessageBuffer + MLDSA_SIGNATURE_SIZE);
 
 				// Handle the request.
-				// Note: on GPIO Pin 1, the "c*s1 multiplication in the NTT" is signaled.
-				// Use GPIO Pin 1 as trigger if you need only that part, and trigger on a falling edge.
-				// Triggering on a falling edge is necessary due to ML-DSA being a variable-length algorithm
-				// (due to so-called "rejection-sampling", which makes it start over).
-				// The {BEGIN,END}_INTERESTING_STUFF macros set GPIO Pin 2 to high/low, which can be used
-				// as debugging tool.
-				BEGIN_INTERESTING_STUFF;
+				// Note: GPIO Pin 2 is set to high somewhere inside the sign function with callbacks.
 				int result = MlDsaState_sign(&g_mldsa, signedMessageBuffer, signedMessageBuffer + MLDSA_SIGNATURE_SIZE);
-				END_INTERESTING_STUFF;
 
 				if (result == 0) {
 					// OK: The message is now signed, let's send the signature of the message back.
