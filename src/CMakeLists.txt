@@ -1,6 +1,8 @@
 # Find programs that are used in flashing the firmware to the device.
 find_program(DFU_SUFFIX dfu-suffix)
 find_program(FLASHTOOL dfu-util)
+# Git is required for applying patches
+find_package(Git REQUIRED)
 
 if(NOT DFU_SUFFIX)
     message(STATUS "dfu-suffix was not found in $PATH, cannot create .dfu files")
@@ -48,6 +50,14 @@ target_include_directories(common PUBLIC
 )
 target_compile_options(common PUBLIC -Werror)
 target_compile_definitions(common PUBLIC STM32F4XX __FPU_USED USE_STDPERIPH_DRIVER HAVE_C99INCLUDES)
+
+include(FetchContent)
+FetchContent_Declare(
+    pqm4
+    GIT_REPOSITORY https://github.com/mupq/pqm4.git
+    GIT_TAG a24bb4b662016968c19f5e6a0719c9ad530f0286
+)
+FetchContent_MakeAvailable(pqm4)
 
 # List of target names
 set(TARGETS classic hw pqc)
@@ -133,24 +143,23 @@ macro(add_licensed_subdir SUBDIR TARGETS SPDX_LICENSE_IDENTIFIER WEBSITE SOURCE_
     list(APPEND PINATA_LICENSED_SUBDIRS ${SUBDIR})
 endmacro()
 
-#                   Subdirectory       Targets      SPDX License           Informational Website                                       Source Code Origin
-add_licensed_subdir(swDES              "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                           https://github.com/Riscure/Pinata.git)
-add_licensed_subdir(swAES              "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                           https://github.com/Riscure/Pinata.git)
-add_licensed_subdir(swmAES             "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                           https://github.com/Riscure/Pinata.git)
-add_licensed_subdir(rsa                "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                           https://github.com/Riscure/Pinata.git)
-add_licensed_subdir(rsacrt             "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                           https://github.com/Riscure/Pinata.git)
-add_licensed_subdir(sm4                "classic;hw" "BSD-3-Clause;OpenSSL" https://en.wikipedia.org/wiki/SM4_\(cipher\)                https://raw.githubusercontent.com/openssl/openssl/704e8090b4a789f52af07de9a3ebbe11db8e19f8/crypto/sm4/sm4.c)
-add_licensed_subdir(swAES256           "classic;hw" MIT                    https://github.com/ilvn/aes256                              https://github.com/ilvn/aes256.git)
-add_licensed_subdir(swAES_Ttables      "classic;hw" CC0-1.0                http://www.efgh.com/software/rijndael.htm                   http://www.efgh.com/software/rijndael.txt)
-add_licensed_subdir(present            "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                           https://github.com/Riscure/Pinata.git)
-add_licensed_subdir(bignum             "classic;hw" MPL-2.0                https://www.di-mgt.com.au/bigdigits.html                    NOTFOUND)
-add_licensed_subdir(prng               "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                           https://github.com/Riscure/Pinata.git)
-add_licensed_subdir(ecc                "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                           https://github.com/Riscure/Pinata.git)
-add_licensed_subdir(curve25519_CortexM "classic;hw" CC0-1.0                https://munacl.cryptojedi.org/curve25519-cortexm0.shtml     https://munacl.cryptojedi.org/data/curve25519-cortexm0-20150813.tar.bz2)
-add_licensed_subdir(pqm4common         pqc          CC0-1.0                https://github.com/mupq/pqm4                                https://github.com/mupq/pqm4.git)
-add_licensed_subdir(dilithium          pqc          CC0-1.0                https://github.com/mupq/pqm4                                https://github.com/mupq/pqm4.git)
-add_licensed_subdir(kyber512           pqc          CC0-1.0                https://github.com/mupq/pqm4                                https://github.com/mupq/pqm4.git)
-#                   Subdirectory       Targets      SPDX License           Informational Website                                       Source Code Origin
+#                   Subdirectory       Targets      SPDX License           Informational Website                                   Source Code Origin
+add_licensed_subdir(swDES              "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                       https://github.com/Riscure/Pinata.git)
+add_licensed_subdir(swAES              "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                       https://github.com/Riscure/Pinata.git)
+add_licensed_subdir(swmAES             "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                       https://github.com/Riscure/Pinata.git)
+add_licensed_subdir(rsa                "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                       https://github.com/Riscure/Pinata.git)
+add_licensed_subdir(rsacrt             "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                       https://github.com/Riscure/Pinata.git)
+add_licensed_subdir(sm4                "classic;hw" "BSD-3-Clause;OpenSSL" https://en.wikipedia.org/wiki/SM4_\(cipher\)            https://raw.githubusercontent.com/openssl/openssl/704e8090b4a789f52af07de9a3ebbe11db8e19f8/crypto/sm4/sm4.c)
+add_licensed_subdir(swAES256           "classic;hw" MIT                    https://github.com/ilvn/aes256                          https://github.com/ilvn/aes256.git)
+add_licensed_subdir(swAES_Ttables      "classic;hw" CC0-1.0                http://www.efgh.com/software/rijndael.htm               http://www.efgh.com/software/rijndael.txt)
+add_licensed_subdir(present            "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                       https://github.com/Riscure/Pinata.git)
+add_licensed_subdir(bignum             "classic;hw" MPL-2.0                https://www.di-mgt.com.au/bigdigits.html                NOTFOUND)
+add_licensed_subdir(prng               "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                       https://github.com/Riscure/Pinata.git)
+add_licensed_subdir(ecc                "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                       https://github.com/Riscure/Pinata.git)
+add_licensed_subdir(curve25519_CortexM "classic;hw" CC0-1.0                https://munacl.cryptojedi.org/curve25519-cortexm0.shtml https://munacl.cryptojedi.org/data/curve25519-cortexm0-20150813.tar.bz2)
+add_licensed_subdir(mldsa              pqc          CC0-1.0                https://github.com/mupq/pqm4                            https://github.com/mupq/pqm4.git)
+add_licensed_subdir(mlkem              pqc          CC0-1.0                https://github.com/mupq/pqm4                            https://github.com/mupq/pqm4.git)
+#                   Subdirectory       Targets      SPDX License           Informational Website                                   Source Code Origin
 
 add_licensed_subdir(
     tea
@@ -160,10 +169,82 @@ add_licensed_subdir(
     "https://en.wikipedia.org/wiki/Tiny_Encryption_Algorithm#Reference_code;https://en.wikipedia.org/wiki/XTEA#Implementations"
 )
 
-# Minor tweaks for the firmware targets.
+# Tweaks for the firmware targets.
 target_compile_definitions(hw PRIVATE HW_CRYPTO_PRESENT)
-target_include_directories(pqc PRIVATE pqm4common)
+set(mldsa_base_dir "${pqm4_SOURCE_DIR}/crypto_sign/ml-dsa-65/m4fstack")
+set(mlkem_base_dir "${pqm4_SOURCE_DIR}/crypto_kem/ml-kem-512/m4fstack")
+set(mupq_common_dir "${pqm4_SOURCE_DIR}/mupq/common")
+set(mupq_common_source_files
+    "${mupq_common_dir}/fips202.c"
+    "${mupq_common_dir}/keccakf1600.c"
+    "${mupq_common_dir}/nistseedexpander.c"
+)
+set(mldsa_source_files
+    "${mldsa_base_dir}/ntt.S"
+    "${mldsa_base_dir}/packing.c"
+    "${mldsa_base_dir}/pointwise_mont.s"
+    "${mldsa_base_dir}/poly.c"
+    "${mldsa_base_dir}/polyvec.c"
+    "${mldsa_base_dir}/rounding.c"
+    "${mldsa_base_dir}/sign.c"
+    "${mldsa_base_dir}/smallntt_769.S"
+    "${mldsa_base_dir}/smallpoly.c"
+    "${mldsa_base_dir}/stack.c"
+    "${mldsa_base_dir}/symmetric-shake.c"
+    "${mldsa_base_dir}/vector.s"
+)
+set(mlkem_source_files
+    "${mlkem_base_dir}/cbd.c"
+    "${mlkem_base_dir}/cmov_int16.S"
+    "${mlkem_base_dir}/fastaddsub.S"
+    "${mlkem_base_dir}/fastbasemul.S"
+    "${mlkem_base_dir}/fastinvntt.S"
+    "${mlkem_base_dir}/fastntt.S"
+    "${mlkem_base_dir}/indcpa.c"
+    "${mlkem_base_dir}/kem.c"
+    "${mlkem_base_dir}/matacc.c"
+    "${mlkem_base_dir}/matacc_asm.S"
+    "${mlkem_base_dir}/ntt.c"
+    "${mlkem_base_dir}/poly.c"
+    "${mlkem_base_dir}/poly_asm.S"
+    "${mlkem_base_dir}/polyvec.c"
+    "${mlkem_base_dir}/reduce.S"
+    "${mlkem_base_dir}/symmetric-fips202.c"
+    "${mlkem_base_dir}/verify.c"
+)
+target_sources(pqc PRIVATE pqm4_hal/randombytes.c pqm4_hal/pinata_callbacks.c ${mupq_common_source_files} ${mldsa_source_files} ${mlkem_source_files})
+set_source_files_properties(mldsa/wrapper.c PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/pqm4_hal;${mldsa_base_dir}")
+set_source_files_properties(mlkem/wrapper.c PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/pqm4_hal;${mlkem_base_dir}")
+set_source_files_properties(${mldsa_source_files} PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/pqm4_hal;${mupq_common_dir}")
+set_source_files_properties(${mlkem_source_files} PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/pqm4_hal;${mupq_common_dir}")
 target_compile_definitions(pqc PRIVATE VARIANT_PQC $<$<BOOL:${RANDOM_SIGNING}>:DILITHIUM_RANDOMIZED_SIGNING>)
+
+# For the short triggering in ML-DSA sign, we need to modify the sign.c source a bit.
+# We use a patch file for that. Apply that patch file as part of the build.
+add_custom_command(
+    OUTPUT
+        "${CMAKE_CURRENT_BINARY_DIR}/mldsa-sign.patch.applied"
+    COMMAND
+        "${GIT_EXECUTABLE}" checkout .
+    COMMAND
+        "${GIT_EXECUTABLE}" apply "${CMAKE_CURRENT_SOURCE_DIR}/../patches/mldsa-sign.patch"
+    COMMAND
+        "${CMAKE_COMMAND}" -E touch "${CMAKE_CURRENT_BINARY_DIR}/mldsa-sign.patch.applied"
+    WORKING_DIRECTORY
+        "${pqm4_SOURCE_DIR}"
+    DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/../patches/mldsa-sign.patch"
+        "${GIT_EXECUTABLE}"
+    COMMENT
+        "Applying patch ${CMAKE_CURRENT_SOURCE_DIR}/../patches/mldsa-sign.patch"
+)
+
+add_custom_target(apply-mldsa-sign-patch
+    DEPENDS
+        "${CMAKE_CURRENT_BINARY_DIR}/mldsa-sign.patch.applied"
+)
+
+add_dependencies(pqc apply-mldsa-sign-patch)
 
 # After having collected all license information into lists, we now generate
 # the notice file.

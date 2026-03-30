@@ -1,0 +1,52 @@
+diff --git a/crypto_sign/ml-dsa-44/m4fstack/sign.c b/crypto_sign/ml-dsa-44/m4fstack/sign.c
+index a08d6d6..3b4c0ff 100644
+--- a/crypto_sign/ml-dsa-44/m4fstack/sign.c
++++ b/crypto_sign/ml-dsa-44/m4fstack/sign.c
+@@ -11,6 +11,8 @@
+ 
+ #include "smallntt.h"
+ 
++#include "pinata_callbacks.h"
++
+ /*************************************************
+ * Name:        crypto_sign_keypair
+ *
+@@ -137,6 +139,7 @@ int crypto_sign_signature_ctx(uint8_t *sig,
+   uint16_t nonce = 0;
+   uint8_t wcomp[K][768];
+   uint8_t ccomp[68];
++  uint8_t PINATA_PATCH_rejected_once = 0;
+ 
+   union {
+     shake128incctx s128;
+@@ -234,7 +237,14 @@ rej:
+       poly_small_ntt_copy(scp, tmp0);
+       unpack_sk_s1(stmp0, sk, l_idx);
+       small_ntt(stmp0->coeffs);
++      if (l_idx == 0 && PINATA_PATCH_rejected_once == 0) {
++        PINATA_PATCH_mldsa_start_callback();
++      }
+       poly_small_basemul_invntt(tmp0, scp, stmp0);
++      if (l_idx == 0 && PINATA_PATCH_rejected_once == 0) {
++        PINATA_PATCH_mldsa_finish_callback();
++        PINATA_PATCH_rejected_once++;
++      }
+ 
+       poly_uniform_gamma1_add_stack(tmp0, tmp0, rhoprime, L*(nonce-1) + l_idx, &state.s256);
+ 
+@@ -246,7 +256,6 @@ rej:
+       polyz_pack(sig + CTILDEBYTES + l_idx*POLYZ_PACKEDBYTES, tmp0);
+   }
+ 
+-
+   /* Write signature */
+   unsigned int hint_n = 0;
+   unsigned int hints_written = 0;
+@@ -288,6 +297,7 @@ rej:
+     }
+     pack_sig_h(sig, tmp0, k_idx, &hints_written);
+   }
++  PINATA_PATCH_mldsa_finish_callback();
+   pack_sig_h_zero(sig, &hints_written);
+   *siglen = CRYPTO_BYTES;
+   return 0;

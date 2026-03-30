@@ -7,6 +7,5 @@
 
 void RNG_Enable(void);
 void RNG_Disable(void);
-void randombytes(char* data, size_t size);
 
 #endif //PINATABOARD_RNG_H

@@ -1,7 +1,7 @@
 # Pinata board
 
 Pinata is a development board (ARM Cortex-M4F) that has been modified and programmed in order to be a training target 
-for Side Channel Analysis (SCA) and Fault Injection (FI) attacks.
+for Side Channel Analysis (SCA) and Fault Injection (FI) attacks. It is based on the STM32F4Discovery board.
 
 ## Features
 
@@ -77,18 +77,16 @@ in the manual).
 #### Lattice-based
 |                    |        | SW       | HW |
 |--------------------|--------|----------|----|
-| CRYSTALS-Dilithium |        |          | -  |
-|                    | LEVEL2 | -        | -  |
-|                    | LEVEL3 | SIG, VER | -  |
-|                    | LEVEL5 | -        | -  |
-| CRYSTALS-Kyber     |        |          |    |
+| ML-DSA FIPS 204    |        |          | -  |
+|                    |     44 | -        | -  |
+|                    |     65 | SIG, VER | -  |
+|                    |     87 | -        | -  |
+| MKL-KEM FIPS 203   |        |          |    |
 |                    |    512 | ENC, DEC | -  |
 |                    |    768 | -        | -  |
 |                    |   1024 | -        | -  |
-|                    | 512-90s| -        | -  |
-|                    | 768-90s| -        | -  |
-|                    |1024-90s| -        | -  |
 
+Note: ML-DSA and ML-KEM are implemented in terms of the [PQM4 library for Cortex-M4 processors](https://github.com/mupq/pqm4.git). The exact git commit hash that is used can be found in the src/CMakeLists.txt file. The library is downloaded into the $BUILD/\_deps/pqm4-src folder.
 
 ### Hash functions
 
@@ -113,39 +111,42 @@ Hardware only
 
 ## Building Pinata Firmware
 
-You can build pinata firmware either using wsl or on a native linux machine. The description bellow is based on an
-UBUNTU 22.04 machine. These steps will also work for wsl, but to get access to the Pinata board in wsl, see the 
-troubleshooting steps about Windows and wsl.
+You can build Pinata firmware either using WSL or on a native linux machine. The description below is based on an UBUNTU 22.04 machine. These steps will also work for WSL, but to get access to the Pinata board in WSL, see the troubleshooting steps about Windows and WSL.
 
 ### Requirements
 
-For cross - compiling the STM32F4Discovery board, you will need a `gcc-arm-none-eabi` toolchain and `cmake`
+For cross-compiling, and flashing, the STM32F4Discovery board, install the following packages:
 ```sh
-sudo apt-get install gcc-arm-none-eabi cmake
-```
-
-For flashing the STM32F4Discovery board, you will need the dfu-util toolkit:
-```sh
-sudo apt-get install dfu-util
+sudo apt-get install gcc-arm-none-eabi cmake dfu-util
 ```
 
 ### Cross-compiling the firmware
 
-For cross-compiling pinata:
+#### Configure
+
+Run the following command to configure the project for the gcc-arm-non-eabi compiler toolchain:
 
 ```sh
-cmake -DCMAKE_TOOLCHAIN_FILE=gcc-arm-none-eabi.toolchain.cmake -S. -Bbuild && cmake --build build
+cmake -DCMAKE_TOOLCHAIN_FILE=gcc-arm-none-eabi.toolchain.cmake -S . -B build
 ```
 
-This will compile all Pinata variations. Output binaries can be found in the `build` folder.
+This will create a ./build folder where you run your Makefile targets. You may customize the path to your compiler toolchain by definining a `PREFIX` variable on the command-line when invoking cmake. See the `gcc-arm-none-eabi.toolchain.cmake` toolchain file for details. (For regular Ubuntu/WSL installations, you don't need to modify the `PREFIX` variable).
+
+#### Build
+
+To build everything, just run `make` inside the configured ./build folder.
+
+This will compile all Pinata variations, which are currently "classic", "hw", and "pqc". Output binaries can be found in the `./build/src` folder.
+
+* The "classic" variant contains non-pqc software ciphers.
+* The "hw" variant contains non-pqc software ciphers, as well as _hardware-accelerated_ ciphers.
+* The "pqc" variant contains ML-DSA FIPS 204 and ML-KEM FIPS 203 software implementations.
 
 Example of compiling a particular firmware:
 
-```sh
- cmake --build build --target classic_bin
-```
+In general, there is a `help` Makefile target defined that you may invoke to view the possible targets to build.
 
-### Flashing the firmware
+### Flashing the firmware (Linux-based)
 
 Add a udev rule for the Pinata:
 
@@ -153,7 +154,7 @@ Add a udev rule for the Pinata:
 sudo mkdir -p /etc/udev/rules.d && echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", MODE="0666", GROUP="plugdev"' | sudo tee /etc/udev/rules.d/69-pinata.rules
 ```
 
-Add user to the `plugdev` group:
+Add your user to the `plugdev` group:
 
 ```sh
 sudo usermod -a -G plugdev $USER
@@ -161,17 +162,31 @@ sudo usermod -a -G plugdev $USER
 
 Check if the physical Pinata is connected to the build machine using the micro USB port on the Pinata.
 
-Run the following command for flashing classic firmware
+Each firmware variant (classic, hw, pqc) has an associated "flash target" that allows one to flash the device while making sure the firmware is up-to-date with the source code. These special targets are named:
+
+* classic_flash
+* hw_flash
+* pqc_flash
+
+For example, run the following command for flashing the classic firmware onto the connected device:
 
 ```sh
-cmake --build build --target classic_flash
+make classic_flash
 ```
 
-Note that this command also makes sure the firmware binary is up-to-date, so for quick iteration loops you can just always run this after editing source code.
+This is assuming you configured with the _Unix Makefiles_ generator.
 
 ## Testing
 
-For more information on testing Pinata functionality, see [PinataTests/README.md](PinataTests/README.md).
+We maintain some integration tests for ensuring the ciphers on the device match reference implementations in the real world. For more information on testing Pinata functionality, see [PinataTests/README.md](PinataTests/README.md).
+
+## Usage
+
+The Pinata firmware works in a "request-response" manner where it waits for a command to appear via UART, optionally with arguments, then processes the command, and then optionally sends back a response.
+
+The available commands are described in the src/main.h file. In there, each `#define` line that starts with `CMD_` is a possible request. Each command is 1 byte, and the argument list for the command depends on the particular command. The arguments for the command are described in comments above the `#define` line.
+
+For the purposes of side-channel analysis, you are supposed to measure the voltage of the chip while the Pinata firmware is running a cryptographic operation. This has been made easy for you to do, because the interesting operations are wrapped in macro blocks named `BEGIN_INTERESTING_STUFF` and `END_INTERESTING_STUFF`. These macros will set GPIO Pin 2 to high and low, respectively. This allows you to trigger an oscilloscope on this GPIO pin and you'll know exactly where the interesting operation happens.
 
 ## Troubleshooting
 

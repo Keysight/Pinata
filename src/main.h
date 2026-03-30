@@ -39,7 +39,7 @@
 #include "sm4/sm4.h"
 #include "tea/tea.h"
 #include "present/present.h"
-#include "dilithium/wrapper.h"
+#include "mldsa/wrapper.h"
 #endif
 
 //ANSSI AES - see https://github.com/ANSSI-FR/SecAESSTM32
@@ -82,17 +82,17 @@
 
 //Pinata board crypto command bytes definition
 
-/// Set the public and private key for the Kyber512 crypto-system.
+/// Set the public and private key for the ML-KEM crypto-system.
 /// The public and private key MUST be valid. No validation is
 /// done by the Pinata.
 ///
 /// Expected Input:
-///   public key bytes of size KYBER512_PUBLIC_KEY_SIZE, followed by
-///   private key bytes of size KYBER512_PRIVATE_KEY_SIZE.
+///   public key bytes of size MLKEM512_PUBLIC_KEY_SIZE, followed by
+///   private key bytes of size MLKEM512_PRIVATE_KEY_SIZE.
 ///
 /// Output:
 ///   One byte; the byte is always zero.
-#define CMD_SW_KYBER512_SET_PUBLIC_AND_PRIVATE_KEY 0x02
+#define CMD_SW_MLKEM_SET_PUBLIC_AND_PRIVATE_KEY 0x02
 
 /// Get the public and private key sizes.
 ///
@@ -102,7 +102,7 @@
 /// Output:
 ///   16-bit unsigned integer in little endian order that contains the public key size, followed by
 ///   16-bit unsigned integer in little endian order that contains the private key size
-#define CMD_SW_KYBER512_GET_KEY_SIZES 0x03
+#define CMD_SW_MLKEM_GET_KEY_SIZES 0x03
 
 /// Generate a shared secret, as well as an accompanying key encapsulation
 /// message (the ciphertext) that is to be sent over a hypothetical public
@@ -110,30 +110,30 @@
 ///
 /// The shared secret is and key encapsulation mesage are generated using the
 /// public key that was set via the command
-/// CMD_SW_KYBER512_SET_PUBLIC_AND_PRIVATE_KEY.
+/// CMD_SW_MLKEM_SET_PUBLIC_AND_PRIVATE_KEY.
 ///
 /// Expected Input:
 ///   None
 ///
 /// Output:
 ///   If generation succeeded, returns a single byte with value 0, followed by
-///   shared secret bytes of size KYBER512_SHARED_SECRET_SIZE, followed by
-///   key encapsulation message (the ciphertext) of size KYBER512_CIPHERTEXT_SIZE
+///   shared secret bytes of size MLKEM_SHARED_SECRET_SIZE, followed by
+///   key encapsulation message (the ciphertext) of size MLKEM_CIPHERTEXT_SIZE
 ///
 ///   If generation failed, returns a single byte with value 1.
-#define CMD_SW_KYBER512_GENERATE 0x04
+#define CMD_SW_MLKEM_GENERATE 0x04
 
 /// Decrypt a key encapsulation message into a shared secret.
 ///
 /// The shared secret is decrypted using the private key that was set via
-/// CMD_SW_KYBER512_SET_PUBLIC_AND_PRIVATE_KEY.
+/// CMD_SW_MLKEM_SET_PUBLIC_AND_PRIVATE_KEY.
 ///
 /// Expected Input:
-///   key encapsulation message (the ciphertext) of size KYBER512_CIPHERTEXT_SIZE
+///   key encapsulation message (the ciphertext) of size MLKEM_CIPHERTEXT_SIZE
 ///
 /// Output:
-///   shared secret bytes of size KYBER512_SHARED_SECRET_SIZE
-#define CMD_SW_KYBER512_DEC 0x05
+///   shared secret bytes of size MLKEM_SHARED_SECRET_SIZE
+#define CMD_SW_MLKEM_DEC 0x05
 
 #define CMD_SWDES_ENC 0x44
 #define CMD_SWDES_DEC 0x45
@@ -160,51 +160,51 @@
 #define CMD_SWXTEA_ENC 0x6E
 #define CMD_SWXTEA_DEC 0x6F
 
-/// Return the Dilithium algorithm variant used in this implementation.
+/// Return the ML-DSA algorithm variant used in this implementation.
 /// The variant is one of the identifiers 1, 2, 3 or 4.
 ///
 /// Expected Input:
 ///   None
 ///
 /// Output:
-///   A single byte whose value is the Dilithium variant.
-#define CMD_SW_DILITHIUM_GET_VARIANT 0x90
+///   A single byte whose value is the ML-DSA variant.
+#define CMD_SW_MLDSA_GET_VARIANT 0x90
 
-/// Set the public and private key for the Dilithium crypto-system.
+/// Set the public and private key for the ML-DSA crypto-system.
 /// The public and private key MUST be valid. No validation is
 /// done by the Pinata.
 ///
 /// Expected Input:
-///   public key bytes of size DILITHIUM_PUBLIC_KEY_SIZE, followed by
-///   private key bytes of size DILITHIUM_PRIVATE_KEY_SIZE.
+///   public key bytes of size MLDSA_PUBLIC_KEY_SIZE, followed by
+///   private key bytes of size MLDSA_PRIVATE_KEY_SIZE.
 ///
 /// Output:
 ///   One byte; the byte is always zero.
-#define CMD_SW_DILITHIUM_SET_PUBLIC_AND_PRIVATE_KEY 0x91
+#define CMD_SW_MLDSA_SET_PUBLIC_AND_PRIVATE_KEY 0x91
 
 /// Verify a signed message, using the public key provided via
-/// CMD_SW_DILITHIUM_SET_PUBLIC_AND_PRIVATE_KEY.
+/// CMD_SW_MLDSA_SET_PUBLIC_AND_PRIVATE_KEY.
 ///
 /// Expected Input:
-///   Signature of length DILITHIUM_SIGNATURE_SIZE, followed by
-///   Message of length PINATA_DILITHIUM_MESSAGE_LENGTH
+///   Signature of length MLDSA_SIGNATURE_SIZE, followed by
+///   Message of length PINATA_MLDSA_MESSAGE_LENGTH
 ///
-///   (in other words, a "signed message" of size PINATA_DILITHIUM_SIGNED_MESSAGE_SIZE).
+///   (in other words, a "signed message" of size PINATA_MLDSA_SIGNED_MESSAGE_SIZE).
 ///
 /// Output:
 ///   One byte; the byte is 0 if the signature of the message is valid,
 ///   non-zero otherwise.
-#define CMD_SW_DILITHIUM_VERIFY 0x92
+#define CMD_SW_MLDSA_VERIFY 0x92
 
 /// Sign a message, using the private key provided via
-/// CMD_SW_DILITHIUM_SET_PUBLIC_AND_PRIVATE_KEY.
+/// CMD_SW_MLDSA_SET_PUBLIC_AND_PRIVATE_KEY.
 ///
 /// Expected Input:
-///   message of length PINATA_DILITHIUM_MESSAGE_LENGTH bytes.
+///   message of length PINATA_MLDSA_MESSAGE_LENGTH bytes.
 ///
 /// Output:
-///   Signature of the message. The signature has size DILITHIUM_SIGNATURE_SIZE.
-#define CMD_SW_DILITHIUM_SIGN 0x93
+///   Signature of the message. The signature has size MLDSA_SIGNATURE_SIZE.
+#define CMD_SW_MLDSA_SIGN 0x93
 
 /// Get the public and private key sizes.
 ///
@@ -214,16 +214,16 @@
 /// Output:
 ///   16-bit unsigned integer in little endian order that contains the public key size, followed by
 ///   16-bit unsigned integer in little endian order that contains the private key size
-#define CMD_SW_DILITHIUM_GET_KEY_SIZES 0x94
+#define CMD_SW_MLDSA_GET_KEY_SIZES 0x94
 
-/// Perform Dilithium NTT.
+/// Perform ML-DSA NTT.
 ///
 /// Expected Input:
-///   A total of DILITHIUM_N 32-bit integers in little endian order.
+///   A total of MLDSA_N 32-bit integers in little endian order.
 ///
 /// Output:
 ///   No reply is sent back.
-#define CMD_SW_DILITHIUM_NTT 0x9A
+#define CMD_SW_MLDSA_NTT 0x9A
 
 #define CMD_SWDES_ENC_MISALIGNED 0x14
 #define CMD_SWAES128_ENC_MISALIGNED 0x1E
