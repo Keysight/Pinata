@@ -292,8 +292,9 @@ int main(void) {
 				get_bytes(MLDSA_MESSAGE_SIZE, signedMessageBuffer + MLDSA_SIGNATURE_SIZE);
 
 				// Handle the request.
-				// Note: GPIO Pin 2 is set to high somewhere inside the sign function with callbacks.
+				BEGIN_INTERESTING_STUFF;
 				int result = MlDsaState_sign(&g_mldsa, signedMessageBuffer, signedMessageBuffer + MLDSA_SIGNATURE_SIZE);
+				END_INTERESTING_STUFF;
 
 				if (result == 0) {
 					// OK: The message is now signed, let's send the signature of the message back.
