@@ -1,5 +1,5 @@
 diff --git a/crypto_sign/ml-dsa-44/m4fstack/sign.c b/crypto_sign/ml-dsa-44/m4fstack/sign.c
-index a08d6d6..542eabc 100644
+index a08d6d6..c50d2a5 100644
 --- a/crypto_sign/ml-dsa-44/m4fstack/sign.c
 +++ b/crypto_sign/ml-dsa-44/m4fstack/sign.c
 @@ -11,6 +11,8 @@
@@ -11,25 +11,38 @@ index a08d6d6..542eabc 100644
  /*************************************************
  * Name:        crypto_sign_keypair
  *
-@@ -234,7 +236,13 @@ rej:
-       poly_small_ntt_copy(scp, tmp0);
-       unpack_sk_s1(stmp0, sk, l_idx);
-       small_ntt(stmp0->coeffs);
-+      if (l_idx == 0) {
-+        PINATA_PATCH_mldsa_start_callback();
-+      }
-       poly_small_basemul_invntt(tmp0, scp, stmp0);
-+      if (l_idx == 0) {
-+        PINATA_PATCH_mldsa_finish_callback();
+@@ -137,6 +139,7 @@ int crypto_sign_signature_ctx(uint8_t *sig,
+   uint16_t nonce = 0;
+   uint8_t wcomp[K][768];
+   uint8_t ccomp[68];
++  uint8_t PINATA_PATCH_rejected_once = 0;
+ 
+   union {
+     shake128incctx s128;
+@@ -227,6 +230,10 @@ rej:
+   poly_challenge_compress(ccomp, tmp0);
+   
+   /* Compute z, reject if it reveals secret */
++  if (PINATA_PATCH_rejected_once == 0) {
++    PINATA_PATCH_mldsa_start_callback();
++    PINATA_PATCH_rejected_once = 1;
++  }
+     for(size_t l_idx=0;l_idx < L; l_idx++){
+     if(l_idx != 0){
+       poly_challenge_decompress(tmp0, ccomp);
+@@ -240,11 +247,14 @@ rej:
+ 
+       poly_reduce(tmp0);
+ 
+-      if(poly_chknorm(tmp0, GAMMA1 - BETA))
++      if(poly_chknorm(tmp0, GAMMA1 - BETA)) {
++        // PINATA PATCH note: this makes the trigger variable-length! trigger on a falling edge.
+         goto rej;
 +      }
  
-       poly_uniform_gamma1_add_stack(tmp0, tmp0, rhoprime, L*(nonce-1) + l_idx, &state.s256);
- 
-@@ -246,7 +254,6 @@ rej:
        polyz_pack(sig + CTILDEBYTES + l_idx*POLYZ_PACKEDBYTES, tmp0);
    }
++  PINATA_PATCH_mldsa_finish_callback();
  
--
+ 
    /* Write signature */
-   unsigned int hint_n = 0;
-   unsigned int hints_written = 0;
