@@ -1,5 +1,5 @@
 diff --git a/crypto_sign/ml-dsa-44/m4fstack/sign.c b/crypto_sign/ml-dsa-44/m4fstack/sign.c
-index a08d6d6..c50d2a5 100644
+index a08d6d6..358344d 100644
 --- a/crypto_sign/ml-dsa-44/m4fstack/sign.c
 +++ b/crypto_sign/ml-dsa-44/m4fstack/sign.c
 @@ -11,6 +11,8 @@
@@ -30,19 +30,19 @@ index a08d6d6..c50d2a5 100644
      for(size_t l_idx=0;l_idx < L; l_idx++){
      if(l_idx != 0){
        poly_challenge_decompress(tmp0, ccomp);
-@@ -240,11 +247,14 @@ rej:
- 
-       poly_reduce(tmp0);
- 
--      if(poly_chknorm(tmp0, GAMMA1 - BETA))
-+      if(poly_chknorm(tmp0, GAMMA1 - BETA)) {
-+        // PINATA PATCH note: this makes the trigger variable-length! trigger on a falling edge.
-         goto rej;
-+      }
- 
+@@ -246,7 +253,6 @@ rej:
        polyz_pack(sig + CTILDEBYTES + l_idx*POLYZ_PACKEDBYTES, tmp0);
    }
-+  PINATA_PATCH_mldsa_finish_callback();
  
- 
+-
    /* Write signature */
+   unsigned int hint_n = 0;
+   unsigned int hints_written = 0;
+@@ -288,6 +294,7 @@ rej:
+     }
+     pack_sig_h(sig, tmp0, k_idx, &hints_written);
+   }
++  PINATA_PATCH_mldsa_finish_callback();
+   pack_sig_h_zero(sig, &hints_written);
+   *siglen = CRYPTO_BYTES;
+   return 0;

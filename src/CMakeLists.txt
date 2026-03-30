@@ -232,6 +232,9 @@ add_custom_command(
         "${CMAKE_COMMAND}" -E touch "${CMAKE_CURRENT_BINARY_DIR}/mldsa-sign.patch.applied"
     WORKING_DIRECTORY
         "${pqm4_SOURCE_DIR}"
+    DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/../patches/mldsa-sign.patch"
+        "${GIT_EXECUTABLE}"
     COMMENT
         "Applying patch ${CMAKE_CURRENT_SOURCE_DIR}/../patches/mldsa-sign.patch"
 )
