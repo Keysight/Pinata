@@ -1,5 +1,5 @@
 diff --git a/crypto_sign/ml-dsa-44/m4fstack/sign.c b/crypto_sign/ml-dsa-44/m4fstack/sign.c
-index a08d6d6..358344d 100644
+index a08d6d6..3b4c0ff 100644
 --- a/crypto_sign/ml-dsa-44/m4fstack/sign.c
 +++ b/crypto_sign/ml-dsa-44/m4fstack/sign.c
 @@ -11,6 +11,8 @@
@@ -19,18 +19,22 @@ index a08d6d6..358344d 100644
  
    union {
      shake128incctx s128;
-@@ -227,6 +230,10 @@ rej:
-   poly_challenge_compress(ccomp, tmp0);
-   
-   /* Compute z, reject if it reveals secret */
-+  if (PINATA_PATCH_rejected_once == 0) {
-+    PINATA_PATCH_mldsa_start_callback();
-+    PINATA_PATCH_rejected_once = 1;
-+  }
-     for(size_t l_idx=0;l_idx < L; l_idx++){
-     if(l_idx != 0){
-       poly_challenge_decompress(tmp0, ccomp);
-@@ -246,7 +253,6 @@ rej:
+@@ -234,7 +237,14 @@ rej:
+       poly_small_ntt_copy(scp, tmp0);
+       unpack_sk_s1(stmp0, sk, l_idx);
+       small_ntt(stmp0->coeffs);
++      if (l_idx == 0 && PINATA_PATCH_rejected_once == 0) {
++        PINATA_PATCH_mldsa_start_callback();
++      }
+       poly_small_basemul_invntt(tmp0, scp, stmp0);
++      if (l_idx == 0 && PINATA_PATCH_rejected_once == 0) {
++        PINATA_PATCH_mldsa_finish_callback();
++        PINATA_PATCH_rejected_once++;
++      }
+ 
+       poly_uniform_gamma1_add_stack(tmp0, tmp0, rhoprime, L*(nonce-1) + l_idx, &state.s256);
+ 
+@@ -246,7 +256,6 @@ rej:
        polyz_pack(sig + CTILDEBYTES + l_idx*POLYZ_PACKEDBYTES, tmp0);
    }
  
@@ -38,7 +42,7 @@ index a08d6d6..358344d 100644
    /* Write signature */
    unsigned int hint_n = 0;
    unsigned int hints_written = 0;
-@@ -288,6 +294,7 @@ rej:
+@@ -288,6 +297,7 @@ rej:
      }
      pack_sig_h(sig, tmp0, k_idx, &hints_written);
    }
