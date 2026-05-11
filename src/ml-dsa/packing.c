@@ -64,7 +64,7 @@ void unpack_pk(uint8_t rho[SEEDBYTES],
 **************************************************/
 void pack_sk(uint8_t sk[CRYPTO_SECRETKEYBYTES],
              const uint8_t rho[SEEDBYTES],
-             const uint8_t tr[CRHBYTES],
+             const uint8_t tr[TRBYTES],
              const uint8_t key[SEEDBYTES],
              const polyveck *t0,
              const polyvecl *s1,
@@ -80,9 +80,9 @@ void pack_sk(uint8_t sk[CRYPTO_SECRETKEYBYTES],
     sk[i] = key[i];
   sk += SEEDBYTES;
 
-  for(i = 0; i < CRHBYTES; ++i)
+  for(i = 0; i < TRBYTES; ++i)
     sk[i] = tr[i];
-  sk += CRHBYTES;
+  sk += TRBYTES;
 
   for(i = 0; i < L; ++i)
     polyeta_pack(sk + i*POLYETA_PACKEDBYTES, &s1->vec[i]);
@@ -101,16 +101,16 @@ void pack_sk(uint8_t sk[CRYPTO_SECRETKEYBYTES],
 *
 * Description: Unpack secret key sk = (rho, tr, key, t0, s1, s2).
 *
-* Arguments:   - const uint8_t rho[]: output byte array for rho
-*              - const uint8_t tr[]: output byte array for tr
-*              - const uint8_t key[]: output byte array for key
-*              - const polyveck *t0: pointer to output vector t0
-*              - const polyvecl *s1: pointer to output vector s1
-*              - const polyveck *s2: pointer to output vector s2
-*              - uint8_t sk[]: byte array containing bit-packed sk
+* Arguments:   - uint8_t rho[]: output byte array for rho
+*              - uint8_t tr[]: output byte array for tr
+*              - uint8_t key[]: output byte array for key
+*              - polyveck *t0: pointer to output vector t0
+*              - polyvecl *s1: pointer to output vector s1
+*              - polyveck *s2: pointer to output vector s2
+*              - const uint8_t sk[]: byte array containing bit-packed sk
 **************************************************/
 void unpack_sk(uint8_t rho[SEEDBYTES],
-               uint8_t tr[CRHBYTES],
+               uint8_t tr[TRBYTES],
                uint8_t key[SEEDBYTES],
                polyveck *t0,
                polyvecl *s1,
@@ -127,9 +127,9 @@ void unpack_sk(uint8_t rho[SEEDBYTES],
     key[i] = sk[i];
   sk += SEEDBYTES;
 
-  for(i = 0; i < CRHBYTES; ++i)
+  for(i = 0; i < TRBYTES; ++i)
     tr[i] = sk[i];
-  sk += CRHBYTES;
+  sk += TRBYTES;
 
   for(i=0; i < L; ++i)
     polyeta_unpack(&s1->vec[i], sk + i*POLYETA_PACKEDBYTES);

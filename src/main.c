@@ -60,7 +60,7 @@
 #include "io.h"
 
 #ifdef VARIANT_PQC
-#include "dilithium/wrapper.h"
+#include "ml-dsa/wrapper.h"
 #include "kyber512/wrapper.h"
 #endif
 
@@ -113,7 +113,7 @@ unsigned char etxBuf[256] ={};
 #define END_INTERESTING_STUFF GPIOC->BSRRH = GPIO_Pin_2
 
 #ifdef VARIANT_PQC
-DilithiumState dilithium;
+MldsaState mldsa;
 Kyber512State kyber512;
 #endif
 
@@ -238,29 +238,29 @@ int main(void) {
 
 #ifdef VARIANT_PQC
 
-			case CMD_SW_DILITHIUM_GET_VARIANT:
+			case CMD_SW_MLDSA_GET_VARIANT:
 				// Return the response.
-				send_char(getDilithiumAlgorithmVariant());
+				send_char(getMldsaAlgorithmVariant());
 				break;
 
-			case CMD_SW_DILITHIUM_SET_PUBLIC_AND_PRIVATE_KEY: {
+			case CMD_SW_MLDSA_SET_PUBLIC_AND_PRIVATE_KEY: {
 				// Receive the input parameters and handle the request.
-				get_bytes(DILITHIUM_PUBLIC_KEY_SIZE, DilithiumState_getPublicKey(&dilithium));
-				get_bytes(DILITHIUM_PRIVATE_KEY_SIZE, DilithiumState_getPrivateKey(&dilithium));
+				get_bytes(MLDSA_PUBLIC_KEY_SIZE, MldsaState_getPublicKey(&mldsa));
+				get_bytes(MLDSA_PRIVATE_KEY_SIZE, MldsaState_getPrivateKey(&mldsa));
 
 				// Return the response.
 				send_char(0);
 				break;
 			}
 
-			case CMD_SW_DILITHIUM_VERIFY: {
+			case CMD_SW_MLDSA_VERIFY: {
 				// Receive the input parameters.
-				uint8_t* signedMessageBuffer = DilithiumState_getScratchPad(&dilithium);
-				get_bytes(DILITHIUM_SIGNED_MESSAGE_SIZE, signedMessageBuffer);
+				uint8_t* signedMessageBuffer = MldsaState_getScratchPad(&mldsa);
+				get_bytes(MLDSA_SIGNED_MESSAGE_SIZE, signedMessageBuffer);
 
 				// Handle the request.
 				BEGIN_INTERESTING_STUFF;
-				int result = DilithiumState_verify(&dilithium, signedMessageBuffer);
+				int result = MldsaState_verify(&mldsa, signedMessageBuffer);
 				END_INTERESTING_STUFF;
 
 				// Return the response.
@@ -268,20 +268,20 @@ int main(void) {
 				break;	
 			}
 
-			case CMD_SW_DILITHIUM_SIGN: {
+			case CMD_SW_MLDSA_SIGN: {
 				// Receive the input parameters.
-				uint8_t* signedMessageBuffer = DilithiumState_getScratchPad(&dilithium);
-				get_bytes(DILITHIUM_MESSAGE_SIZE, signedMessageBuffer + DILITHIUM_SIGNATURE_SIZE);
+				uint8_t* signedMessageBuffer = MldsaState_getScratchPad(&mldsa);
+				get_bytes(MLDSA_MESSAGE_SIZE, signedMessageBuffer + MLDSA_SIGNATURE_SIZE);
 
 				// Handle the request.
 				BEGIN_INTERESTING_STUFF;
-				int result = DilithiumState_sign(&dilithium, signedMessageBuffer, signedMessageBuffer + DILITHIUM_SIGNATURE_SIZE);
+				int result = MldsaState_sign(&mldsa, signedMessageBuffer, signedMessageBuffer + MLDSA_SIGNATURE_SIZE);
 				END_INTERESTING_STUFF;
 
 				if (result == 0) {
 					// OK: The message is now signed, let's send the signature of the message back.
 					send_char(0);
-					send_bytes(DILITHIUM_SIGNATURE_SIZE, signedMessageBuffer);
+					send_bytes(MLDSA_SIGNATURE_SIZE, signedMessageBuffer);
 				} else {
 					// ERROR: Signing the message failed.
 					send_char(1);
@@ -289,21 +289,21 @@ int main(void) {
 				break;
 			}
 
-			case CMD_SW_DILITHIUM_GET_KEY_SIZES: {
-				const uint16_t publicKeySize = DILITHIUM_PUBLIC_KEY_SIZE;
-				const uint16_t privateKeySize = DILITHIUM_PRIVATE_KEY_SIZE;
+			case CMD_SW_MLDSA_GET_KEY_SIZES: {
+				const uint16_t publicKeySize = MLDSA_PUBLIC_KEY_SIZE;
+				const uint16_t privateKeySize = MLDSA_PRIVATE_KEY_SIZE;
 				// Send the response; MUST be in little-endian order!
 				send_bytes(sizeof(publicKeySize), (const uint8_t*)&publicKeySize);
 				send_bytes(sizeof(privateKeySize), (const uint8_t*)&privateKeySize);
 				break;
 			}
 
-			case CMD_SW_DILITHIUM_NTT: {
-				int32_t polynomialBuffer[DILITHIUM_N];
+			case CMD_SW_MLDSA_NTT: {
+				int32_t polynomialBuffer[MLDSA_N];
 				// Receive the polynomial coefficients.
-				get_bytes(sizeof(int32_t)*DILITHIUM_N, (uint8_t*)polynomialBuffer);
+				get_bytes(sizeof(int32_t)*MLDSA_N, (uint8_t*)polynomialBuffer);
 				BEGIN_INTERESTING_STUFF;
-				Dilithium_ntt(polynomialBuffer);
+				Mldsa_ntt(polynomialBuffer);
 				END_INTERESTING_STUFF;
 				// No reply is sent.
 				break;

@@ -9,10 +9,10 @@
 
 
 // void asm_pointwise_montgomery(int32_t c[N], const int32_t a[N], const int32_t b[N]);
-.global pqcrystals_dilithium_asm_pointwise_montgomery
-.type pqcrystals_dilithium_asm_pointwise_montgomery,%function
+.global pqcrystals_mldsa_asm_pointwise_montgomery
+.type pqcrystals_mldsa_asm_pointwise_montgomery,%function
 .align 2
-pqcrystals_dilithium_asm_pointwise_montgomery:
+pqcrystals_mldsa_asm_pointwise_montgomery:
     push.w {r4-r11, r14}
     c_ptr .req r0
     a_ptr .req r1
@@ -61,13 +61,13 @@ pqcrystals_dilithium_asm_pointwise_montgomery:
     str.w res, [c_ptr]
 
     pop.w {r4-r11, pc}
-.size pqcrystals_dilithium_asm_pointwise_montgomery, .-pqcrystals_dilithium_asm_pointwise_montgomery
+.size pqcrystals_mldsa_asm_pointwise_montgomery, .-pqcrystals_mldsa_asm_pointwise_montgomery
 
 // void asm_pointwise_acc_montgomery(int32_t c[N], const int32_t a[N], const int32_t b[N]);
-.global pqcrystals_dilithium_asm_pointwise_acc_montgomery
-.type pqcrystals_dilithium_asm_pointwise_acc_montgomery,%function
+.global pqcrystals_mldsa_asm_pointwise_acc_montgomery
+.type pqcrystals_mldsa_asm_pointwise_acc_montgomery,%function
 .align 2
-pqcrystals_dilithium_asm_pointwise_acc_montgomery:
+pqcrystals_mldsa_asm_pointwise_acc_montgomery:
     push.w {r4-r11, r14}
     c_ptr .req r0
     a_ptr .req r1
@@ -125,4 +125,4 @@ pqcrystals_dilithium_asm_pointwise_acc_montgomery:
     str.w res, [c_ptr]
 
     pop.w {r4-r11, pc}
-.size pqcrystals_dilithium_asm_pointwise_acc_montgomery, .-pqcrystals_dilithium_asm_pointwise_acc_montgomery
+.size pqcrystals_mldsa_asm_pointwise_acc_montgomery, .-pqcrystals_mldsa_asm_pointwise_acc_montgomery

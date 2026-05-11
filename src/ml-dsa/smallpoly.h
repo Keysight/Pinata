@@ -6,7 +6,7 @@
 
 
 
-#if DILITHIUM_MODE == 3 // use q=769
+#if MLDSA_MODE == 65 // use q=769
 #define SMALL_POLY_16_BIT
 typedef struct {
     int16_t coeffs[N];

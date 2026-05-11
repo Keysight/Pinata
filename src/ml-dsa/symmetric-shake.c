@@ -3,7 +3,7 @@
 #include "symmetric.h"
 #include "fips202.h"
 
-void dilithium_shake128_stream_init(shake128incctx *state, const uint8_t seed[SEEDBYTES], uint16_t nonce)
+void mldsa_shake128_stream_init(shake128incctx *state, const uint8_t seed[SEEDBYTES], uint16_t nonce)
 {
   uint8_t t[2];
   t[0] = nonce;
@@ -15,7 +15,7 @@ void dilithium_shake128_stream_init(shake128incctx *state, const uint8_t seed[SE
   shake128_inc_finalize(state);
 }
 
-void dilithium_shake256_stream_init(shake256incctx *state, const uint8_t seed[CRHBYTES], uint16_t nonce)
+void mldsa_shake256_stream_init(shake256incctx *state, const uint8_t seed[CRHBYTES], uint16_t nonce)
 {
   uint8_t t[2];
   t[0] = nonce;

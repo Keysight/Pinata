@@ -7,10 +7,10 @@
 .endm
 
 // void asm_reduce32(int32_t a[N]);
-.global pqcrystals_dilithium_asm_reduce32
-.type pqcrystals_dilithium_asm_reduce32, %function
+.global pqcrystals_mldsa_asm_reduce32
+.type pqcrystals_mldsa_asm_reduce32, %function
 .align 2
-pqcrystals_dilithium_asm_reduce32:
+pqcrystals_mldsa_asm_reduce32:
     push {r4-r10}
 
     movw r12,#:lower16:8380417
@@ -48,7 +48,7 @@ pqcrystals_dilithium_asm_reduce32:
 
     pop {r4-r10}
     bx lr
-.size pqcrystals_dilithium_asm_reduce32, .-pqcrystals_dilithium_asm_reduce32
+.size pqcrystals_mldsa_asm_reduce32, .-pqcrystals_mldsa_asm_reduce32
 
 .macro caddq a, tmp, q
     and     \tmp, \q, \a, asr #31
@@ -61,10 +61,10 @@ pqcrystals_dilithium_asm_reduce32:
 .endm
 
 // // void asm_freeze(int32_t a[N]);
-// .global pqcrystals_dilithium_asm_freeze
-// .type pqcrystals_dilithium_asm_freeze, %function
+// .global pqcrystals_mldsa_asm_freeze
+// .type pqcrystals_mldsa_asm_freeze, %function
 // .align 2
-// pqcrystals_dilithium_asm_freeze:
+// pqcrystals_mldsa_asm_freeze:
 //     push {r4-r10}
 
 //     movw r12,#:lower16:8380417
@@ -103,13 +103,13 @@ pqcrystals_dilithium_asm_reduce32:
 
 //     pop {r4-r10}
 //     bx lr
-// .size pqcrystals_dilithium_asm_freeze, .-pqcrystals_dilithium_asm_freeze
+// .size pqcrystals_mldsa_asm_freeze, .-pqcrystals_mldsa_asm_freeze
 
 // void asm_caddq(int32_t a[N]);
-.global pqcrystals_dilithium_asm_caddq
-.type pqcrystals_dilithium_asm_caddq, %function
+.global pqcrystals_mldsa_asm_caddq
+.type pqcrystals_mldsa_asm_caddq, %function
 .align 2
-pqcrystals_dilithium_asm_caddq:
+pqcrystals_mldsa_asm_caddq:
     push {r4-r10}
 
     movw r12,#:lower16:8380417
@@ -148,14 +148,14 @@ pqcrystals_dilithium_asm_caddq:
 
     pop {r4-r10}
     bx lr
-.size pqcrystals_dilithium_asm_caddq, .-pqcrystals_dilithium_asm_caddq
+.size pqcrystals_mldsa_asm_caddq, .-pqcrystals_mldsa_asm_caddq
 
 
 // asm_rej_uniform(int32_t *a,unsigned int len,const unsigned char *buf, unsigned int buflen);
-.global pqcrystals_dilithium_asm_rej_uniform
-.type pqcrystals_dilithium_asm_rej_uniform, %function
+.global pqcrystals_mldsa_asm_rej_uniform
+.type pqcrystals_mldsa_asm_rej_uniform, %function
 .align 2
-pqcrystals_dilithium_asm_rej_uniform:
+pqcrystals_mldsa_asm_rej_uniform:
     push.w {r4-r6}
     push.w {r1}
     // Store Q-1 in r12.
@@ -188,4 +188,4 @@ end:
     sub.w r0, r5, r0, lsr #2
     pop.w {r4-r6}
     bx lr
-.size pqcrystals_dilithium_asm_rej_uniform, .-pqcrystals_dilithium_asm_rej_uniform
+.size pqcrystals_mldsa_asm_rej_uniform, .-pqcrystals_mldsa_asm_rej_uniform

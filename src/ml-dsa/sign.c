@@ -106,7 +106,7 @@ int crypto_sign_signature(uint8_t *sig,
   shake256_inc_finalize(&state);
   shake256_inc_squeeze(mu, CRHBYTES, &state);
 
-#ifdef DILITHIUM_RANDOMIZED_SIGNING
+#ifdef MLDSA_RANDOMIZED_SIGNING
   randombytes(rhoprime, CRHBYTES);
 #else
   crh(rhoprime, key, SEEDBYTES + CRHBYTES);

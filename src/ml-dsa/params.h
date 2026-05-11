@@ -3,17 +3,18 @@
 
 #include "config.h"
 
-#define DILITHIUM_NAMESPACE(s) pqcrystals_dilithium_##s
+#define MLDSA_NAMESPACE(s) pqcrystals_mldsa_##s
 
 
 #define SEEDBYTES 32
-#define CRHBYTES 48
+#define CRHBYTES 64
+#define TRBYTES 64
 #define N 256
 #define Q 8380417
 #define D 13
 #define ROOT_OF_UNITY 1753
 
-#if DILITHIUM_MODE == 2
+#if MLDSA_MODE == 44
 #define K 4
 #define L 4
 #define ETA 2
@@ -22,9 +23,10 @@
 #define GAMMA1 (1 << 17)
 #define GAMMA2 ((Q-1)/88)
 #define OMEGA 80
-#define CRYPTO_ALGNAME "Dilithium2"
+#define CRYPTO_ALGNAME "Mldsa-44"
+#define CTILDEBYTES 32
 
-#elif DILITHIUM_MODE == 3
+#elif MLDSA_MODE == 65
 #define K 6
 #define L 5
 #define ETA 4
@@ -33,9 +35,10 @@
 #define GAMMA1 (1 << 19)
 #define GAMMA2 ((Q-1)/32)
 #define OMEGA 55
-#define CRYPTO_ALGNAME "Dilithium3"
+#define CRYPTO_ALGNAME "Mldsa-65"
+#define CTILDEBYTES 48
 
-#elif DILITHIUM_MODE == 5
+#elif MLDSA_MODE == 87
 #define K 8
 #define L 7
 #define ETA 2
@@ -44,7 +47,8 @@
 #define GAMMA1 (1 << 19)
 #define GAMMA2 ((Q-1)/32)
 #define OMEGA 75
-#define CRYPTO_ALGNAME "Dilithium5"
+#define CRYPTO_ALGNAME "Mldsa-87"
+#define CTILDEBYTES 64
 
 #endif
 
@@ -71,10 +75,10 @@
 #endif
 
 #define CRYPTO_PUBLICKEYBYTES (SEEDBYTES + K*POLYT1_PACKEDBYTES)
-#define CRYPTO_SECRETKEYBYTES (2*SEEDBYTES + CRHBYTES \
+#define CRYPTO_SECRETKEYBYTES (2*SEEDBYTES + TRBYTES \
                                + L*POLYETA_PACKEDBYTES \
                                + K*POLYETA_PACKEDBYTES \
                                + K*POLYT0_PACKEDBYTES)
-#define CRYPTO_BYTES (SEEDBYTES + L*POLYZ_PACKEDBYTES + POLYVECH_PACKEDBYTES)
+#define CRYPTO_BYTES (CTILDEBYTES + L*POLYZ_PACKEDBYTES + POLYVECH_PACKEDBYTES)
 
 #endif

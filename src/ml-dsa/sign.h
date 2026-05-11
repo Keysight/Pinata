@@ -8,7 +8,7 @@
 #include "polyvec.h"
 #include "poly.h"
 
-#define challenge DILITHIUM_NAMESPACE(challenge)
+#define challenge MLDSA_NAMESPACE(challenge)
 void challenge(poly *c, const uint8_t seed[SEEDBYTES]);
 
 // #define crypto_sign_keypair DILITHIUM_NAMESPACE(crypto_sign_keypair)

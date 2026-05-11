@@ -39,11 +39,11 @@ smlad r0,r0,r0,r0
   add.w \pol0, \pol0, \th
 .endm
 
-//void pqcrystals_dilithium_ntt(int32_t p[N]);
-.global pqcrystals_dilithium_ntt
-.type pqcrystals_dilithium_ntt,%function
+//void pqcrystals_mldsa_ntt(int32_t p[N]);
+.global pqcrystals_mldsa_ntt
+.type pqcrystals_mldsa_ntt,%function
 .align 2
-pqcrystals_dilithium_ntt:
+pqcrystals_mldsa_ntt:
   //bind aliases
   ptr_p     .req R0
   ptr_zeta  .req R1
@@ -308,11 +308,11 @@ pqcrystals_dilithium_ntt:
   smlal \y, \pol, \x, \q
 .endm
 
-//void pqcrystals_dilithium_invntt_tomont(int32_t p[N]);
-.global pqcrystals_dilithium_invntt_tomont
-.type pqcrystals_dilithium_invntt_tomont,%function
+//void pqcrystals_mldsa_invntt_tomont(int32_t p[N]);
+.global pqcrystals_mldsa_invntt_tomont
+.type pqcrystals_mldsa_invntt_tomont,%function
 .align 2
-pqcrystals_dilithium_invntt_tomont:
+pqcrystals_mldsa_invntt_tomont:
   //bind aliases
   ptr_p     .req R0
   ptr_zeta  .req R1

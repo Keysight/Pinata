@@ -16,7 +16,7 @@ set(PINATA_VID 0483)
 set(PINATA_DID 2200)
 set(FLASH_TARGET_OFFSET 0x08000000)
 
-option(RANDOM_SIGNING "Enable random signing for Dilithium cipher" OFF)
+option(RANDOM_SIGNING "Enable random signing for ML-DSA cipher" OFF)
 
 # Common lib
 file(GLOB COMMON_SOURCE_FILES
@@ -148,7 +148,7 @@ add_licensed_subdir(prng               "classic;hw" BSD-3-Clause-Clear     https
 add_licensed_subdir(ecc                "classic;hw" BSD-3-Clause-Clear     https://github.com/Riscure/Pinata                           https://github.com/Riscure/Pinata.git)
 add_licensed_subdir(curve25519_CortexM "classic;hw" CC0-1.0                https://munacl.cryptojedi.org/curve25519-cortexm0.shtml     https://munacl.cryptojedi.org/data/curve25519-cortexm0-20150813.tar.bz2)
 add_licensed_subdir(pqm4common         pqc          CC0-1.0                https://github.com/mupq/pqm4                                https://github.com/mupq/pqm4.git)
-add_licensed_subdir(dilithium          pqc          CC0-1.0                https://github.com/mupq/pqm4                                https://github.com/mupq/pqm4.git)
+add_licensed_subdir(ml-dsa             pqc          CC0-1.0                https://github.com/mupq/pqm4                                https://github.com/mupq/pqm4.git)
 add_licensed_subdir(kyber512           pqc          CC0-1.0                https://github.com/mupq/pqm4                                https://github.com/mupq/pqm4.git)
 #                   Subdirectory       Targets      SPDX License           Informational Website                                       Source Code Origin
 
@@ -163,7 +163,7 @@ add_licensed_subdir(
 # Minor tweaks for the firmware targets.
 target_compile_definitions(hw PRIVATE HW_CRYPTO_PRESENT)
 target_include_directories(pqc PRIVATE pqm4common)
-target_compile_definitions(pqc PRIVATE VARIANT_PQC $<$<BOOL:${RANDOM_SIGNING}>:DILITHIUM_RANDOMIZED_SIGNING>)
+target_compile_definitions(pqc PRIVATE VARIANT_PQC $<$<BOOL:${RANDOM_SIGNING}>:MLDSA_RANDOMIZED_SIGNING>)
 
 # After having collected all license information into lists, we now generate
 # the notice file.

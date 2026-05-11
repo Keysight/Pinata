@@ -442,12 +442,12 @@ void poly_uniform_eta(poly *a,
 *              of SHAKE256(seed|nonce) or AES256CTR(seed,nonce).
 *
 * Arguments:   - poly *a: pointer to output polynomial
-*              - const uint8_t seed[]: byte array with seed of length CRHBYTES
+*              - const uint8_t seed[]: byte array with seed of length TRBYTES
 *              - uint16_t nonce: 16-bit nonce
 **************************************************/
 #define POLY_UNIFORM_GAMMA1_NBLOCKS ((POLYZ_PACKEDBYTES + STREAM256_BLOCKBYTES - 1)/STREAM256_BLOCKBYTES)
 void poly_uniform_gamma1(poly *a,
-                         const uint8_t seed[CRHBYTES],
+                         const uint8_t seed[TRBYTES],
                          uint16_t nonce)
 {
   uint8_t buf[POLY_UNIFORM_GAMMA1_NBLOCKS*STREAM256_BLOCKBYTES];

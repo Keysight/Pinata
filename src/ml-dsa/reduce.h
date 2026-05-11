@@ -7,7 +7,7 @@
 #define MONT -4186625 // 2^32 % Q
 #define QINV 58728449 // q^(-1) mod 2^32
 
-#define montgomery_reduce DILITHIUM_NAMESPACE(montgomery_reduce)
+#define montgomery_reduce MLDSA_NAMESPACE(montgomery_reduce)
 /*************************************************
 * Name:        montgomery_reduce
 *
