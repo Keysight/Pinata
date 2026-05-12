@@ -97,7 +97,7 @@ uint8_t rxBuffer[RXBUFFERLENGTH] = {};
 const uint8_t zeros[20]={'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'};
 const uint8_t glitched[] = { 0xFA, 0xCC };
 const uint8_t cmdByteIsWrong[] = { 'B','a','d','C','m','d','\n',0x00};
-const uint8_t codeVersion[] = { 'V','e','r',' ','3','.','2',0x00};
+const uint8_t codeVersion[] = { 'V','e','r',' ','4','.','0',0x00};
 
 volatile uint8_t usbSerialEnabled=0;
 volatile int busyWait1;
