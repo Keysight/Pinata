@@ -14,22 +14,22 @@
 #include <termios.h>
 #include <unistd.h>
 
-constexpr const size_t PINATA_DILITHIUM_MESSAGE_LENGTH = 16;
-constexpr const size_t PINATA_KYBER512_SHARED_SECRET_LENGTH = 32;
+constexpr const size_t PINATA_MLDSA_MESSAGE_LENGTH = 16;
+constexpr const size_t PINATA_MLKEM_SHARED_SECRET_LENGTH = 32;
 
 const uint8_t CMD_GET_CODE_REV = 0xF1;
 const uint8_t CMD_HWAES128_ENC = 0xCA;
 
-const uint8_t CMD_SW_DILITHIUM_GET_VARIANT = 0x90;
-const uint8_t CMD_SW_DILITHIUM_SET_PUBLIC_AND_PRIVATE_KEY = 0x91;
-const uint8_t CMD_SW_DILITHIUM_VERIFY = 0x92;
-const uint8_t CMD_SW_DILITHIUM_SIGN = 0x93;
-const uint8_t CMD_SW_DILITHIUM_GET_KEY_SIZES = 0x94;
+const uint8_t CMD_SW_MLDSA_GET_VARIANT = 0x90;
+const uint8_t CMD_SW_MLDSA_SET_PUBLIC_AND_PRIVATE_KEY = 0x91;
+const uint8_t CMD_SW_MLDSA_VERIFY = 0x92;
+const uint8_t CMD_SW_MLDSA_SIGN = 0x93;
+const uint8_t CMD_SW_MLDSA_GET_KEY_SIZES = 0x94;
 
-const uint8_t CMD_SW_KYBER512_SET_PUBLIC_AND_PRIVATE_KEY = 0x02;
-const uint8_t CMD_SW_KYBER512_GET_KEY_SIZES = 0x03;
-const uint8_t CMD_SW_KYBER512_GENERATE = 0x04;
-const uint8_t CMD_SW_KYBER512_DEC = 0x05;
+const uint8_t CMD_SW_MLKEM_SET_PUBLIC_AND_PRIVATE_KEY = 0x02;
+const uint8_t CMD_SW_MLKEM_GET_KEY_SIZES = 0x03;
+const uint8_t CMD_SW_MLKEM_GENERATE = 0x04;
+const uint8_t CMD_SW_MLKEM_DEC = 0x05;
 
 const uint8_t CMD_SWDES_ENC = 0x44;
 const uint8_t CMD_SWDES_DEC = 0x45;
@@ -89,7 +89,7 @@ std::pair<int, int> PinataClient::getVersion() {
 
 FirmwareVariant PinataClient::determineFirmwareVariant() {
     // Detect it via this command. It will return "BadCmd\n" when dealing with a classic or hw variant.
-    command(CMD_SW_DILITHIUM_GET_VARIANT);
+    command(CMD_SW_MLDSA_GET_VARIANT);
     uint8_t byte;
     read(&byte, sizeof(byte));
     // If we're dealing with a PQC variant then this should return the number "3".
@@ -122,21 +122,21 @@ FirmwareVariant PinataClient::determineFirmwareVariant() {
     return FirmwareVariant::Classic;
 }
 
-uint8_t PinataClient::dilithiumGetSecurityLevel() {
-    command(CMD_SW_DILITHIUM_GET_VARIANT);
+uint8_t PinataClient::mldsaGetSecurityLevel() {
+    command(CMD_SW_MLDSA_GET_VARIANT);
     return readNumber<uint8_t>();
 }
 
-std::pair<int, int> PinataClient::dilithiumGetKeySizes() {
-    command(CMD_SW_DILITHIUM_GET_KEY_SIZES);
+std::pair<int, int> PinataClient::mldsaGetKeySizes() {
+    command(CMD_SW_MLDSA_GET_KEY_SIZES);
     const uint16_t publicKeySize = readNumber<uint16_t>();
     const uint16_t privateKeySize = readNumber<uint16_t>();
     return std::make_pair(publicKeySize, privateKeySize);
 }
 
-void PinataClient::dilithiumSetPublicPrivateKeyPair(const uint8_t *publicKey, size_t publicKeySize,
-                                                    const uint8_t *privateKey, size_t privateKeySize) {
-    command(CMD_SW_DILITHIUM_SET_PUBLIC_AND_PRIVATE_KEY);
+void PinataClient::mldsaSetPublicPrivateKeyPair(const uint8_t *publicKey, size_t publicKeySize,
+                                                const uint8_t *privateKey, size_t privateKeySize) {
+    command(CMD_SW_MLDSA_SET_PUBLIC_AND_PRIVATE_KEY);
     write(publicKey, publicKeySize);
     write(privateKey, privateKeySize);
     if (readNumber<uint8_t>() != 0) {
@@ -144,9 +144,9 @@ void PinataClient::dilithiumSetPublicPrivateKeyPair(const uint8_t *publicKey, si
     }
 }
 
-void PinataClient::dilithiumSign(const uint8_t *messageBuffer, size_t messageBufferSize, uint8_t *signedMessageBuffer,
-                                 size_t signedMessageBufferSize) {
-    command(CMD_SW_DILITHIUM_SIGN);
+void PinataClient::mldsaSign(const uint8_t *messageBuffer, size_t messageBufferSize, uint8_t *signedMessageBuffer,
+                             size_t signedMessageBufferSize) {
+    command(CMD_SW_MLDSA_SIGN);
     write(messageBuffer, messageBufferSize);
     if (readNumber<uint8_t>() != 0) {
         throw std::runtime_error("pinata failed to sign this message");
@@ -154,22 +154,22 @@ void PinataClient::dilithiumSign(const uint8_t *messageBuffer, size_t messageBuf
     read(signedMessageBuffer, signedMessageBufferSize);
 }
 
-bool PinataClient::dilithiumVerify(const uint8_t *signatureBuffer, size_t signatureBufferSize) {
-    command(CMD_SW_DILITHIUM_VERIFY);
+bool PinataClient::mldsaVerify(const uint8_t *signatureBuffer, size_t signatureBufferSize) {
+    command(CMD_SW_MLDSA_VERIFY);
     write(signatureBuffer, signatureBufferSize);
     return readNumber<uint8_t>() == 0;
 }
 
-std::pair<int, int> PinataClient::kyber512GetKeySizes() {
-    command(CMD_SW_KYBER512_GET_KEY_SIZES);
+std::pair<int, int> PinataClient::mlkemGetKeySizes() {
+    command(CMD_SW_MLKEM_GET_KEY_SIZES);
     const uint16_t publicKeySize = readNumber<uint16_t>();
     const uint16_t privateKeySize = readNumber<uint16_t>();
     return std::make_pair(publicKeySize, privateKeySize);
 }
 
-void PinataClient::kyber512SetPublicPrivateKeyPair(const uint8_t *publicKey, size_t publicKeySize,
-                                                   const uint8_t *privateKey, size_t privateKeySize) {
-    command(CMD_SW_KYBER512_SET_PUBLIC_AND_PRIVATE_KEY);
+void PinataClient::mlkemSetPublicPrivateKeyPair(const uint8_t *publicKey, size_t publicKeySize,
+                                                const uint8_t *privateKey, size_t privateKeySize) {
+    command(CMD_SW_MLKEM_SET_PUBLIC_AND_PRIVATE_KEY);
     write(publicKey, publicKeySize);
     write(privateKey, privateKeySize);
     if (readNumber<uint8_t>() != 0) {
@@ -177,9 +177,9 @@ void PinataClient::kyber512SetPublicPrivateKeyPair(const uint8_t *publicKey, siz
     }
 }
 
-void PinataClient::kyber512Generate(uint8_t *sharedSecretBuffer, size_t sharedSecretBufferSize,
-                                    uint8_t *keyEncapsulationMessageBuffer, size_t keyEncapsulationMessageBufferSize) {
-    command(CMD_SW_KYBER512_GENERATE);
+void PinataClient::mlkemGenerate(uint8_t *sharedSecretBuffer, size_t sharedSecretBufferSize,
+                                 uint8_t *keyEncapsulationMessageBuffer, size_t keyEncapsulationMessageBufferSize) {
+    command(CMD_SW_MLKEM_GENERATE);
     if (readNumber<uint8_t>() != 0) {
         throw std::runtime_error("failed to generate shared secret");
     }
@@ -187,10 +187,9 @@ void PinataClient::kyber512Generate(uint8_t *sharedSecretBuffer, size_t sharedSe
     read(keyEncapsulationMessageBuffer, keyEncapsulationMessageBufferSize);
 }
 
-void PinataClient::kyber512Decode(const uint8_t *keyEncapsulationMessageBuffer,
-                                  size_t keyEncapsulationMessageBufferSize, uint8_t *sharedSecretBuffer,
-                                  size_t sharedSecretBufferSize) {
-    command(CMD_SW_KYBER512_DEC);
+void PinataClient::mlkemDecode(const uint8_t *keyEncapsulationMessageBuffer, size_t keyEncapsulationMessageBufferSize,
+                               uint8_t *sharedSecretBuffer, size_t sharedSecretBufferSize) {
+    command(CMD_SW_MLKEM_DEC);
     write(keyEncapsulationMessageBuffer, keyEncapsulationMessageBufferSize);
     if (readNumber<uint8_t>() != 0) {
         throw std::runtime_error("failed to decode shared secret");

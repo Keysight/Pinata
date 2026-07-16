@@ -1,0 +1,30 @@
+diff --git a/crypto_sign/ml-dsa-44/m4fstack/sign.c b/crypto_sign/ml-dsa-44/m4fstack/sign.c
+index a08d6d6..52538f6 100644
+--- a/crypto_sign/ml-dsa-44/m4fstack/sign.c
++++ b/crypto_sign/ml-dsa-44/m4fstack/sign.c
+@@ -11,6 +11,8 @@
+ 
+ #include "smallntt.h"
+ 
++#include "pinata_callbacks.h"
++
+ /*************************************************
+ * Name:        crypto_sign_keypair
+ *
+@@ -246,7 +248,6 @@ rej:
+       polyz_pack(sig + CTILDEBYTES + l_idx*POLYZ_PACKEDBYTES, tmp0);
+   }
+ 
+-
+   /* Write signature */
+   unsigned int hint_n = 0;
+   unsigned int hints_written = 0;
+@@ -288,6 +289,8 @@ rej:
+     }
+     pack_sig_h(sig, tmp0, k_idx, &hints_written);
+   }
++  PINATA_PATCH_mldsa_start_callback();
++  PINATA_PATCH_mldsa_finish_callback();
+   pack_sig_h_zero(sig, &hints_written);
+   *siglen = CRYPTO_BYTES;
+   return 0;
